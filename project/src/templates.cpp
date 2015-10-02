@@ -28,6 +28,8 @@ T mysequence<T,N>::getmember (int x) {
     return memblock[x];
 }
 
+//There are no arguments at this time
+
 int main () {
     mysequence <int,5> myints;
     mysequence <double,5> myfloats;
