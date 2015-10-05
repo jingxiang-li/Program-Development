@@ -1,4 +1,7 @@
 /* from github as of 20 September 2015
+ Jingxiang Li
+ Tanoja Sunkam
+
  Csci3081 Lab 4.
  This file has been taken from: http://www.cplusplus.com/doc/tutorial/templates/
  It is largely a vehicle for experimenting with team work using git.
