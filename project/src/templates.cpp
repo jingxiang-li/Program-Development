@@ -36,7 +36,7 @@ T mysequence<T,N>::getmember (int x) {
 int main () {
     mysequence <int,5> myints;
     mysequence <double,5> myfloats;
-    myints.setmember (0,100);
+    myints.setmember (1,100);
     myfloats.setmember (3,3.1416);
     cout << myints.getmember(0) << '\n';
     cout << myfloats.getmember(3) << '\n';
