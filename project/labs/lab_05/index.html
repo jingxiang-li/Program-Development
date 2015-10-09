@@ -1,0 +1,388 @@
+<style type="text/css">
+<!--
+code{
+	font-weight: bold;
+}
+span.cmd{
+	font-family: monospace;
+	color: #800080;
+	font-size: 1.2em;
+}
+span.file{
+	font-family: monospace;
+	color: #222;
+	font-size: 1.2em;
+	padding: 0px 0.5em;
+	background: #f0f0f0;
+	border: 1px dashed #dfdfdf;
+}
+a span.dir{
+	color: #00F;
+}
+span.persons{
+	font-size: 1.1em;
+	font-weight: bold;
+}
+-->
+</style>
+
+<h3>Lab Session 5: Debugging with the GNU Debugger GDB</h3>
+
+<p><strong>Lab 5 due date:</strong> none, simply turn in work
+  completed during lab.</p>
+<hr/>
+
+
+<h3>Prerequisites:</h3>
+<ol>
+ <li><p>This lab is to be done with your project partner.  If your
+ partner is not present then ask your TA how to proceed.</p>
+
+ <li><p>Get the latest additions to the class repository down to your
+  account.  In the <code>labs/lab_05</code> directory will be some
+  files that you need for this lab. </p>
+
+  <p>Create a directory named <code>labs/lab_05</code> at the top
+  level of your <b>group</b> repository and copy the lab 5 files from
+  the class repository there.</p>
+
+  <p>Use Git to 'add', 'commit' and 'push' the 'labs' directory.</p>
+  </li>
+</ol>
+
+ 
+<h3>Using GDB</h3>
+
+<p>Use <code>gdb</code> to find
+  the locations of segmentation faults in the
+  program <code>buggy.cpp</code>.</p>
+
+<p>At the end of the lab session, commit and push your work to the
+  central github repository.  You <b>do not</b> need to find all the bugs to
+  receive full credit for this lab.</p>
+
+<p>However, you cannot leave early until you've shown the TA that
+ your <code>buggy</code> program runs without segmentation
+ faults.</p>
+
+<p>
+There is one bug in the code that can't be found by <code>gdb</code> because it doesn't cause a segfault. You'll need to use the <code>valgrind</code> memory mismanagement detector. You can find a tutorial on <code>valgrind</code>
+    <a href="http://cs.ecs.baylor.edu/~donahoo/tools/valgrind/"> here </a>
+    </p>
+
+<p>In this debugging process, make sure <b>you and your partner both
+ run <code>gdb</code> at least once</b> in this process.  All the work
+ can be done in the workspace of a single person, however.</p>
+
+
+<hr/>
+<h4>Useful gdb commands:</h4>
+
+The following is a basic set of commands to get your started. The <b>highlighted</b> commands are the most useful for getting started.
+
+      <p>
+         unix level commands -- entered at the $ prompt:
+      </p>
+      <table border="1" cellspacing="0" summary="unix level commands">
+         <tr>
+            <td>
+               man gdb
+            </td>
+            <td>
+               to get help on gdb at the unix command level
+            </td>
+         </tr>
+         <tr>
+            <td>
+               g++ -g -o program <em>filename.cpp</em>
+            </td>
+            <td>
+               to compile &amp; link with the debug (-g) option (without this, you won't see line numbers)
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>gdb program</b>
+            </td>
+            <td>
+               to execute the debugger on executable <b>program</b>
+            </td>
+         </tr>
+         <tr>
+             <td>
+                 <b>valgrind program</b>
+             </td>
+             <td>
+                 to execute valgrind on executable <b>program</b>
+             </td>
+         </tr>
+      </table>
+      <p>
+         Basic gdb commands -- entered after the (gdb) prompt:
+      </p>
+      <table border="1" cellspacing="0" summary="gdb commands">
+         <tr>
+            <td>
+               help
+            </td>
+            <td>
+               to display a list of gdb commands
+            </td>
+         </tr>
+         <tr>
+            <td>
+               help <em>command</em>
+            </td>
+            <td>
+               to get help on a specified gdb command
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>run</b>
+            </td>
+            <td>
+               to run/execute the program starting from the beginning
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>backtrace</b>
+            </td>
+            <td>
+               show the current stack (which function is being executed)
+            </td>
+	    </tr>
+         <tr>
+            <td>
+               <b>up</b>
+            </td>
+            <td>
+               move up in the backtrace stack
+            </td>
+	    </tr>
+         <tr>
+            <td>
+               <b>down</b>
+            </td>
+            <td>
+               move down in the backtrace stack
+            </td>
+	    </tr>
+
+         <tr>
+            <td>
+               continue
+            </td>
+            <td>
+               to resume running/executing the program
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>next</b>
+            </td>
+            <td>
+               to execute the current statement and stop at the next statement
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>step</b>
+            </td>
+            <td>
+               same as next, but step into a function
+            </td>
+         </tr>
+         <tr>
+            <td>
+               list <em>xx</em>
+            </td>
+            <td>
+               list source lines starting at line <em>xx</em>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               list
+            </td>
+            <td>
+               to list the next source lines
+            </td>
+         </tr>
+         <tr>
+            <td>
+               list <em>xx</em>,<em>yy</em>
+            </td>
+            <td>
+               to list sources lines from line <em>xx</em> to line <em>yy</em>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               list <em>filename</em>:<em>xx</em>
+            </td>
+            <td>
+               to list source lines in the specified file starting at line <em>xx</em>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               quit
+            </td>
+            <td>
+               to quit gdb and revert to the unix command level
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>break <em>functionname</em></b>
+            </td>
+            <td>
+               to set a breakpoint at the start of a function (set this before typing <b>run</b>)
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>break <em>classname</em>::<em>functionname</em></b>
+            </td>
+            <td>
+               to set a breakpoint at the start of a member function
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>break <em>filename</em>:<em>xx</em></b>
+            </td>
+            <td>
+               to set a breakpoint at line <em>xx</em> in the specified file
+            </td>
+         </tr>
+         <tr>
+            <td>
+               break <em>xx</em>
+            </td>
+            <td>
+               to set a breakpoint at line <em>xx</em> in the current file
+            </td>
+         </tr>
+         <tr>
+            <td>
+               break 1
+            </td>
+            <td>
+               to set a breakpoint at the first line in the current file (declaration or executable statement)
+            </td>
+         </tr>
+         <tr>
+            <td>
+               info break
+            </td>
+            <td>
+               to list all breakpoints (including those disabled); breakpoints are numbered #1, #2, #3, etc.
+            </td>
+         </tr>
+         <tr>
+            <td>
+               disable <em>xx</em>
+            </td>
+            <td>
+               to disable breakpoint #<em>xx</em>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               enable <em>xx</em>
+            </td>
+            <td>
+               to enable breakpoint #<em>xx</em>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>print <em>v1</em></b>
+            </td>
+            <td>
+               to print the value of a specified variable
+            </td>
+         </tr>
+         <tr>
+            <td>
+               info source
+            </td>
+            <td>
+               to show the name of the current source file
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <b>info locals</b>
+         </td>
+            <td>
+               to show local variables in the current frame
+            </td>
+         </tr>
+         <tr>
+            <td>
+               info sources
+            </td>
+            <td>
+               to list the name of all source files in use
+            </td>
+         </tr>
+         <tr>
+            <td>
+               set <em>variable</em> = <em>value</em>
+            </td>
+            <td>
+               to assign a new value to a specified variable
+            </td>
+         </tr>
+         <tr>
+            <td>
+               (return)
+            </td>
+            <td>
+               to re-execute the previous gdb command; this is particularly useful if the previous gdb command was next or step
+            </td>
+         </tr>
+      </table>
+      <p>
+         You can also execute most gdb commands by entering only the first letter of the command.
+      </p>
+<p/>
+<hr/>
+<h4>GDB References</h4>
+
+There are many places to find additional documentation on <code>gdb</code>:
+<ul>
+<li>Command reference: <a href="http://www.yolinux.com/TUTORIALS/GDB-Commands.html">here</a></li>
+<li>Another tutorial: <a href="http://www.cs.cmu.edu/~gilpin/tutorial/">here</a></li>
+<li>Search for "gdb tutorial" on the web.</li>
+</ul>
+
+
+<hr>
+<h3>Using gdb on your own programs</h3>
+
+<ol>
+  <li><p>Make sure that the debugging symbols are being generated when
+  you compile your programs. To do this edit the Makefile. For all
+  lines calling <b>g++</b> add the flag <b>-g</b>. (i.e. <b>g++ -g -o
+  ...</b>)</p></li>
+  <li><p>Then do a <b>make clean</b> and recompile. Then you can run
+  gdb on your executable.</p></li> 
+</ol>
+
+
+<hr>
+<h3>What to turn in.</h3>
+
+<p>If you've found all of the bugs before the end of the lab session ask
+the TA to  verify that you've completed the work.  Then commit/push
+your work using Git so that it is available on the central github
+repository.</p>
+
+<p>If you've not finished finding all of the bugs by the end of lab,
+  turn in your work anyway.  You do not need to have found all of the
+  bugs to get full credit for this lab. </p>
