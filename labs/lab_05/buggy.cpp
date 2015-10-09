@@ -1,6 +1,6 @@
 // Author: Dan DaCosta for csci3081, lab 5.
-// Debugged by team: TEAM_NAME_HERE
-// Team Members: NAME1 NAME2 ... 
+// Debugged by team: J.and.T
+// Team Members: Tanoja Sunkam, Jingxiang Li 
 
 #include <iostream>
 #include <string>
@@ -12,10 +12,10 @@ using namespace std;
 // randomly.
 int** newMat(int x,int y) {
     int ** a = new int*[x];
-    for(int i = 0; i <= x; i+1) {
+    for(int i = 0; i < x; i++) {
         a[i] = new int[y];
         for(int j = 0; j < y; j++) {
-            a[j][j] = rand() % 13;
+            a[i][j] = rand() % 13;
         }
     }
     return a;
@@ -35,7 +35,7 @@ int** mulMat(int x, int y, int z, int ** A, int ** B) {
         for(int j = 0; j < z; j++) {
             R[i][j] = 0;
             for(int k = 0; k < y; k++) {
-                R[i][j] += A[i][k]*B[j][k];
+                R[i][j] += A[i][k]*B[k][j];
             }
         }
     }
@@ -54,12 +54,23 @@ void prnMat(int x, int y, int ** A) {
     cout<<endl;
 }
 
+void freeMat(int ** A, int x, int y) {
+    for (int i = 0; i < x; i++)
+        delete[] A[i];
+    delete[] A;
+}
+
 void execute() {
     int ** A = newMat(7,11);
     int ** B = newMat(11,13);
     int ** C = mulMat(7,11,13,A,B);
-    prnMat(71,13,C);
+    prnMat(7,13,C);
+    freeMat(A, 7, 11);
+    freeMat(B, 11, 13);
+    freeMat(C, 7, 13);
 }
+
+
 
 int main(int argc, char ** argv) {
     execute();
