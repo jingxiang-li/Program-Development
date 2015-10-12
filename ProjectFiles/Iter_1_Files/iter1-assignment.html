@@ -1,0 +1,301 @@
+<h2>Iteration 1 - Building the first component of the Translator: The Scanner</h2>
+
+<h3>Updates:</h3>
+<ul> 
+<li>
+Make sure to check this file reqularly (i.e., at least daily) for updates!
+</li>
+</ul>
+
+
+<h3>Specifications for the scanner</h3>
+
+<p>For the first iteration of the project, you will build a scanner
+that takes as input a sample program in our domain specific programming language
+CDAL (Climate Data Analysis Language), 
+recognizes the tokens in the program, and returns them in a linked
+list.</p>
+
+<p>You will write several test cases to demonstrate that your code
+  works properly.  In fact, you will not write a <code>main</code>
+  function to create an executable program for this iteration.  All
+  execution of your scanner code will be done via test cases.</p>
+
+<p>Several sample program files, a skeleton of a testing file, and
+  other C++ files are provided.  You can find all of these files 
+  in the public course Git repository (class_repo) in a directory named
+  <code>ProjectFiles/Iter_1_Files</code>.</p>
+
+<p>You should keep in mind that, like all software development
+  projects, the requirements for the scanner may change some in later
+  iterations.  Thus, you should design your code in a manner that
+  such future changes will be not be too difficult to implement.</p>
+
+
+<h3>Required directory structure for the course project.</h3>
+<p>For lab 4 you created a directory <code>project</code> that
+  contained and <code>src</code> directory.</p>
+
+<p>You will be given some C++ files to put into the <code>src</code>
+  directory in the <code>project</code> directory.
+
+<p>Also some files go in a <code>samples</code> directory. 
+  The <code>samples</code> directory must be placed inside
+  the <code>project</code>directory (and thus next to
+  the <code>src</code> directory).
+
+<p>A copy of the <code>cxxtest</code> directory must also be placed in
+  your <code>project</code> directory.  You should use the version of cxxtest
+  that was given to you in lab 3. The
+<code>Makefile</code> provided indicates precisely where this
+  directory and its contents must be located in your repository.</p>
+
+
+
+<h3>Structural requirements for the code.</h3>
+
+<p>There are some requirements on the data types and functions used in
+your implementation of the scanner.  These will be utilized by the
+parser, which we will incorporate in the next iteration.</p>
+
+<h4>An enumerated type for kinds of tokens.</h4>
+<p> <code>tokenEnumType</code> is defined in scanner.h. 
+Its definition should have the form
+<pre>
+    enum tokenEnumType { 
+
+        ... intConst, floatConst, ... 
+        // and other names of types of legal tokens
+        endOfFile, lexicalError
+    } ;
+</pre>
+It is very important that you <b>NOT</b> modify this definition.
+If you do, you will likely loose many points.
+</p>
+
+
+<p>You must define the type name <code>tokenType</code> to refer to
+this enumerated type.  This is done as follows:
+<pre>
+    typedef enum tokenEnumType tokenType ;
+</pre></p>
+
+<p>These are provided for you in the partially
+complete <code>scanner.h</code> file.</p>
+
+<p>The values in this enumerated type (e.g., <code>intConst</code>, 
+<code>floatConst</code>, <i>etc.</i>) must be kept as is so that they
+can be used by the parser in iteration 2 and by the test cases we will
+run in assessing your work.</p>
+
+<h4>A class for tokens.</h4>
+<p>You must define a class for tokens named <code>Token</code>. It must
+  have the following fields:
+ <ul>
+  <li>a field named <code>terminal</code> of
+  type <code>tokenType</code>, </li>
+  <li>a field named <code>lexeme</code> that
+  is <code>string</code>.</li>
+  <li>a field named <code>next</code> whose type is a pointer to this
+    class type <code>Token</code>.  This will be used for creating a
+    linked list of tokens that will be passed to the parser.  This
+    list is used in some of the tests in
+    the <code>scanner_tests.h</code> file provided to you.</li>
+ </ul>
+All of these fields must be <b>public</b>.
+This will facilitate automated testing.
+</p>
+
+<p>This class can have additional fields however, for example, keeping
+track of the length of the lexeme, or the line and column number on
+which it began.
+</p>
+
+<h4>A class for the scanner.</h4>
+<p>You must also define a class named <code>Scanner</code> that has
+  a <code>scan</code> method of the following type:
+<pre>
+    Token *scan (const char *) ;
+</pre></p>
+
+<p>This method is used in some of the provided test cases.</p>
+
+
+<h3>Behavioral requirements for the code.</h3>
+<p>While most of the behavioral requirements will be clear from the
+ test cases provided, a few additional comments included below may be helpful.
+<ol>
+<li>All lists returned by the scanner should end with a token object whose
+  terminal is <code>endOfFile</code></li>
+
+<li>All lists should contain one and only one token object whose terminal is
+ <code>endOfFile</code></li>
+
+<li>When a lexical error occurs, the scanner should create a token with a
+    single-character lexeme and <code>lexicalError</code> as the
+    terminal.</li>
+</ol>
+</p>
+
+<h3>Tasks.</h3>
+<p>There are three main tasks for you to complete in this iteration.
+  The first is to write an adequate set of tests that exercise your
+  code and the second is to write the code that will pass the tests you create (the minimum set of
+  tests required are described in the assessment section below),
+  and the tests we provided.</p>
+
+
+<h4>Writing tests</h4>
+<p>In the file <code>scanner_tests.h</code> provided you will find some
+comments instructing you to write test cases that exercise the
+functions and methods that are called by your <code>scan</code>
+method.  The design and implementation for these is up to you.  The
+only requirement is that these supporting functions and methods
+provide significant support to <code>scan</code> and that your tests
+cases for them properly test the code.</p>
+
+<p>The goal is that by writing and testing these supporting functions
+  and methods we can significantly simplify the writing and testing of
+<code>scan</code>.  We discussed testing length in a number of lectures
+so you should refer to your notes from those lectures. We will revisit the topic as well.  </p>
+
+
+<h4>Writing the code</h4>
+<p>The specifications in this document primarily address this task.</p>
+
+<h4>Division of labor statement</h4> 
+<p>You are also required to document how you and your partner(s) split
+up the work of this iteration. You must specify what parts of the
+design each of you did, or if this work was done jointly. For design
+work you are strongly encouraged to work together. You must also
+specify what parts of the code each of you have completed - some of
+this will be work done individually, other parts may be done jointly,
+perhaps using pair programming techniques. This document must reside
+in a plain text file named <code>iteration1_work.txt</code> that must
+be placed inside the <code>src</code> directory.</p>
+
+<p> To the degree possible, your commits should correspond to the
+code you have written.</p>
+ 
+
+<h3>Due dates and submission and assessment procedures.</h3>
+<p>You source code and test cases must be committed to
+your <i>team</i> Git repository and must be stored in the
+directory <code>project/src/</code>.  An additional requirement of
+creating a new branch for the work that you turn in will be discussed
+in lecture or lab and the specifics will be accessible on moodle.  Stay tuned.</p>
+
+<p>We will check out your work and run <code>make run-tests</code>,
+  among other commands, from your <code>src</code> directory to
+  assess your code. </p>
+
+<ul>
+
+<li><p>More specifically, when we evaluate your code we will run the following
+    command:</p>
+    <pre>     make run-tests</pre></p>
+    <p>Make sure that your Makefile has this as its target for running
+    the tests.</p></li>
+
+<li><p>Moreover, We will run the test
+    cases that you have in your modified <code>scanner_tests.h</code>
+    file, but we will ALSO run the tests in the
+    original <code>scanner_tests.h</code> file that we gave you  Thus,
+    you <strong> MUST NOT </strong> modify the enumerated type given to you
+    in <code>scanner.h</code>.</p>
+</li>
+</ul>
+
+<p>The due date for this iteration is Tuesday, October 20 at 11:55pm.
+  Your code and test cases must be committed by this time.</p>
+
+<h3>Assessment.</h3>
+
+<p>The following rubric will be used to compute your score for
+  Iteration 1.
+
+<pre>
+Possible points: 150.
+
+Code Development Process: 80 points.
+------------------------------------
+(These points are assessed once, on the due date.)
+
+Correct use of Git (12 points).  Are each of the following
+files (or directories) in the correct place in your
+team repository?
+
+___ / 1:  project/lib/cxxtest
+___ / 1:  project/samples/bad_syntax_good_tokens.dsl
+___ / 1:  project/samples/forest_loss_v2.dsl
+___ / 1:  project/src/readInput.h
+___ / 1:  project/src/readInput.cpp
+___ / 1:  project/src/regex.h
+___ / 1:  project/src/regex.cpp
+___ / 1:  project/src/scanner.h
+___ / 1:  project/src/scanner.cpp
+___ / 1:  project/src/scanner_tests.h
+___ / 1:  project/src/iteration1_work.txt
+___ / 1:  proper use of .gitignore, no executable files, .o files or files with a trailing ~ committed
+
+Division of work statement (5 points).
+
+___ / 5: An satisfactory  division of work statement.
+
+
+Successful compilation and generation of tests cases.  (9 points)
+Each of the following command succeeds with no errors.
+
+___ / 2: make scanner.o
+___ / 2: make scanner_tests.cpp
+___ / 2: make scanner_tests
+
+___ / 5: Code is commented according to McConnell's guidelines in Chapter 31, section 6.
+
+There is a test case for each terminal symbol type in the enumerated
+type tokenType.  (41 points)
+
+___ / 41: a test case for each item in tokenType, 1 point each
+          For a terminal named X, a test case named test_terminal_X
+          must be present.  For example, for the floatConst terminal
+          symbol (a value in the tokenType enumerated type) you must
+          have a test named test_terminal_floatConst.
+
+
+Running test cases doesn't result in a segmentation fault. (10 points)
+Test cases may fail, but should not cause the testing framework to
+crash. 
+
+___ / 10: 
+
+
+
+Passing Test Cases: 70 points.
+------------------------------
+(These points will be assessed in the next iteration as well
+and thus if you fail to
+pass some test cases now you can get those points back on iteration 2.)
+
+___ / 41: passes a test case for each item in tokenType, 1 point each
+          For a terminal named X, a test case named test_terminal_X
+          must pass present.  For example, for the floatConst terminal
+          symbol (a value in the tokenType enumerated type) you must
+          have a test named test_terminal_floatConst that passes.
+
+___ /  2: passes the test  test_scan_empty
+
+___ /  2: passes the test  test_scan_empty_comment
+
+___ /  2: passes the test  test_scan_lexicalErrors
+
+___ /  3: passes the test  test_scan_nums_vars
+
+___ / 10: passes the test  test_scan_bad_syntax_good_tokens
+
+___ / 10: passes the test  test_scan_sample_forest_loss_v2
+
+</pre>
+
+
+
+

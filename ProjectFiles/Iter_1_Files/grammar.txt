@@ -1,0 +1,45 @@
+Program ::= varName '(' ')' '{' Stmts '}'  //root
+Stmts ::= <<empty>>
+Stmts ::= Stmt Stmts
+
+Stmt ::= Decl
+Stmt ::= '{' Stmts '}'
+Stmt ::= 'if' '(' Expr ')' Stmt 
+Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
+Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr ';'	
+Stmt ::= 'print' '(' Expr ')' ';'
+Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
+Stmt ::= ';'
+
+Decl ::= 'int' varName ';'
+Decl ::= 'float' varName ';'
+Decl ::= 'string' varName ';'
+
+Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '=' Expr ';'
+Decl ::= 'matrix' varName '=' Expr ';'
+
+Expr ::= varName
+Expr ::= integerConst | floatConst |  stringConst
+Expr ::= 'true' | 'false'
+
+Expr ::= Expr '*' Expr 
+Expr ::= Expr '/' Expr 
+Expr ::= Expr '+' Expr
+Expr ::= Expr '-' Expr
+Expr ::= Expr '>' Expr
+Expr ::= Expr '>=' Expr 
+Expr ::= Expr '<' Expr
+Expr ::= Expr '<=' Expr 
+Expr ::= Expr '==' Expr 
+Expr ::= Expr '!=' Expr 
+Expr ::= Expr '&&' Expr 
+Expr ::= Expr '||' Expr 
+
+Expr ::= varName '[' Expr ':' Expr ']'   //MatrixREf
+Expr ::= varName '(' Expr ')'        //NestedOrFunctionCall
+Expr ::= '(' Expr ')'              
+
+Expr ::= 'let' Stmts 'in' Expr 'end'  //LetExpr
+Expr ::= 'if' Expr 'then' Expr 'else' Expr    //IfExpr
+Expr ::= '!' Expr                          //NotExpr
+
