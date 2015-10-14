@@ -6,18 +6,18 @@ FLAGS = -Wall -g
 
 # Program files.
 readInput.o:	readInput.cpp readInput.h
-	g++ $(FLAGS) -c readInput.cpp 
+	g++ $(FLAGS) -c readInput.cpp
 
 regex.o:	regex.cpp regex.h
-	g++ $(FLAGS) -c regex.cpp 
+	g++ $(FLAGS) -c regex.cpp
 
 scanner.o:	scanner.cpp scanner.h regex.h
-	g++ $(FLAGS) -c scanner.cpp 
+	g++ $(FLAGS) -c scanner.cpp
 
 
 
 # Testing files and targets.
-run-tests:	regex_tests scanner_tests 
+run-tests:	regex_tests scanner_tests
 	./regex_tests
 	./scanner_tests
 
@@ -37,5 +37,5 @@ scanner_tests.cpp:	scanner.o scanner_tests.h readInput.h
 clean:
 	rm -Rf *.o \
 		regex_tests regex_tests.cpp \
-		scanner_tests scanner_tests.cpp 
+		scanner_tests scanner_tests.cpp
 

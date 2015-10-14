@@ -1,6 +1,7 @@
 #include "scanner.h"
 #include <iostream>
-#include "regex.h"
+#include "string.h"
+#include "./regex.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ int Scanner::matchTokenType(char *text, tokenType terminal) {
             re = makeRegex("^[0-9]+\\.[0-9]+");
             break;
         case stringConst:
-            re = makeRegex("^\".*\"");
+            re = makeRegex("^\"[^\"]*\"");
             break;
 
         // Names
@@ -98,12 +99,142 @@ int Scanner::matchTokenType(char *text, tokenType terminal) {
             re = makeRegex("^:");
             break;
 
+
+        case endOfFile:
+            // re = makeRegex("^$");
+            if (strlen(text) == 0)
+                return 1;
+            else
+                return 0;
+            break;
+
         default:
             return 0;
     }
-    if (re == NULL)
-        perror("Failed to make regular expression");
+
+    if (re == NULL) {
+        cerr << "Failed to make regular expression" << endl;
+        return -1;
+    }
+
     numMatchedChars = matchRegex(re, text);
-    free(re);
+
     return numMatchedChars;
+}
+
+int Scanner::consumeWhiteSpaceAndComments(char *text) {
+    regex_t *whiteSpace = makeRegex("^[\n\t\r ]+");
+    regex_t *blockComment = makeRegex("^/\\*([^\\*]|\\*+[^\\*/])*\\*+/");
+    regex_t *lineComment = makeRegex("^//[^\n]*\n");
+
+    int numMatchedChars = 0;
+    int totalNumMatchedChars = 0;
+    int stillConsumingWhiteSpace;
+
+    do {
+        stillConsumingWhiteSpace = 0;  // exit loop if not reset by a match
+
+        // Try to match white space
+        numMatchedChars = matchRegex(whiteSpace, text);
+        totalNumMatchedChars += numMatchedChars;
+        if (numMatchedChars > 0) {
+            text = text + numMatchedChars;
+            stillConsumingWhiteSpace = 1;
+        }
+
+        // Try to match block comments
+        numMatchedChars = matchRegex(blockComment, text);
+        totalNumMatchedChars += numMatchedChars;
+        if (numMatchedChars > 0) {
+            text = text + numMatchedChars;
+            stillConsumingWhiteSpace = 1;
+        }
+
+        // Try to match line comments
+        numMatchedChars = matchRegex(lineComment, text);
+        totalNumMatchedChars += numMatchedChars;
+        if (numMatchedChars > 0) {
+            text = text + numMatchedChars;
+            stillConsumingWhiteSpace = 1;
+        }
+    } while (stillConsumingWhiteSpace);
+
+    return totalNumMatchedChars;
+}
+
+int Scanner::matchToken(char *text, Token *&matchedToken) {
+    /**
+     * iterate through all tokens by using a for loop and find the one
+     * that gives the maximum match length. Note that the order of
+     * tokens is very important. For example, "int" will be matched
+     * by both intKwd and variableName with exactly the same length, and we
+     * want it to be intKwd, not variableName.
+     */
+
+    int maxNumMatchedChars = -1;
+    tokenType matchedType = lexicalError;
+
+    for (int tokenTypeIndex = intKwd; tokenTypeIndex <= lexicalError;
+         tokenTypeIndex++) {
+        tokenType currentType = static_cast<tokenType>(tokenTypeIndex);
+        int numMatchedChars = matchTokenType(text, currentType);
+
+        if (numMatchedChars > maxNumMatchedChars) {
+            // this is strictly larger than, if we have two match with
+            // same length then priority is given to the first one
+            // that was tried.
+            maxNumMatchedChars = numMatchedChars;
+            matchedType = currentType;
+        }
+    }
+
+    if (maxNumMatchedChars == -1) {
+        cerr << "Failed to parse the token, didn't match any token type"
+             << endl;
+        return -1;
+    }
+
+    string lexeme(text, text + maxNumMatchedChars);
+    tokenType terminal = matchedType;
+    matchedToken = new Token(lexeme, terminal, NULL);
+
+    if (matchedToken == NULL) {
+        cerr << "Failed to allocate memory for the token" << lexeme << endl;
+        return -1;
+    }
+
+    return maxNumMatchedChars;
+}
+
+Token *Scanner::makeTokenList(char *text) {
+    // int totalLength = strlen(text);
+    head = NULL;
+    tail = NULL;
+    Token *matchedToken;
+    do {
+        int skipLength = consumeWhiteSpaceAndComments(text);
+        text += skipLength;
+        // totalLength -= skipLength;
+        // if (totalLength <= 0) break;
+
+        int matchedLength = matchToken(text, matchedToken);
+
+        if (matchedToken == NULL) return NULL;
+
+        if (head == NULL && tail == NULL) {
+            head = matchedToken;
+            tail = head;
+        } else {
+            tail->next = matchedToken;
+            tail = tail->next;
+        }
+
+        text += matchedLength;
+        // totalLength -= matchedLength;
+    } while (tail->terminal != endOfFile);
+    return head;
+}
+
+Token *Scanner::scan(char *text) {
+    return makeTokenList(text);
 }

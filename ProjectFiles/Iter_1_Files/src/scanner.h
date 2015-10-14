@@ -72,19 +72,16 @@ typedef enum tokenEnumType tokenType;
 
 class Token {
 public:
-    Token(string lexeme, tokenType terminal, Token *next);
-    ~Token();
-
-private:
     string lexeme;
     tokenType terminal;
     Token *next;
+
+    Token(string lexeme, tokenType terminal, Token *next);
+    ~Token();
 };
 
 class Scanner {
 public:
-    Scanner();
-    ~Scanner();
     /**
      * scan the input text and return a list of Tokens parsed from the text
      * @param  text input string
@@ -97,6 +94,7 @@ private:
     // head and tail pointer for the list of Tokens
     Token *head = NULL;
     Token *tail = NULL;
+
     /**
      * given the input text and the token type, return the length of the
      * matched string
@@ -105,20 +103,33 @@ private:
      * @return          On success, length of the matched string; otherwise -1;
      */
     int matchTokenType(char *text, tokenType terminal);
+
     /**
-     * given the input text, return the matched Token
-     * @param  text input string
-     * @return      On success, create a Token instance and return a pointer
-     * to this instance; otherwise NULL
+     * given the input text match the Token and return the length of
+     * the matched characters
+     * @param  text        input string
+     * @param  mathedToken a reference to the pointer to the Token instance,
+     * which will be modified by this function
+     * @return             On success, return the nubmer of mached characters;
+     * otherwise -1;
      */
-    Token *matchToken(char *text);
+    int matchToken(char *text, Token *&matchedToken);
+
+    /**
+     * match white space and comments, modified from WordCount.cpp
+     * @param  text input text
+     * @return      the length of string that contains space or comments
+     */
+    int consumeWhiteSpaceAndComments(char *text);
+
     /**
      * make a list of Tokens given the input text, head and tail will be
      * modified after calling this function
      * @param  text input string
-     * @return      0 on success, -1 on faliure.
+     * @return      on success, return the pointer to the head of the list;
+     * otherwise NULL
      */
-    int makeTokenList(char *text);
+    Token *makeTokenList(char *text);
 };
 
 #endif /* SCANNER_H */
