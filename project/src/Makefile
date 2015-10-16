@@ -2,7 +2,7 @@ CXX_DIR = ../lib/cxxtest
 CXXTEST = $(CXX_DIR)/cxxtestgen.pl
 CXXFLAGS = --error-printer --abort-on-fail --have-eh
 
-FLAGS = -Wall -g
+FLAGS = -Wall -g -O -fstack-protector
 
 # Program files.
 readInput.o:	readInput.cpp readInput.h

@@ -10,10 +10,6 @@ using namespace std;
 /* This enumerated type is used to keep track of what kind of
    construct was matched.
  */
- 
-/* This is just a sample comment
-*/
-
 enum tokenEnumType {
 
     intKwd,
@@ -71,8 +67,12 @@ enum tokenEnumType {
 };
 typedef enum tokenEnumType tokenType;
 
-// Below you need to write your class definitions for Token and Scanner.
-
+/**
+ * Below is a class Token used for storing information of a single
+ * token parsed from the text. A Token instance contains the a lexeme
+ * (matched string), a terminal (type of the matched string) and a
+ * next pointer pointing to the next Token.
+ */
 class Token {
 public:
     string lexeme;
@@ -83,6 +83,10 @@ public:
     ~Token();
 };
 
+/**
+ * Below is the class Scanner used for scanning the text and parsing it to a
+ * list of Tokens
+ */
 class Scanner {
 public:
     /**
