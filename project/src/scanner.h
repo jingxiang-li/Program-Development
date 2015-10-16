@@ -80,7 +80,7 @@ public:
     Token *next;
 
     Token(string lexeme, tokenType terminal, Token *next);
-    ~Token();
+    // ~Token();
 };
 
 /**
@@ -97,6 +97,17 @@ public:
      */
     Token *scan(const char *text);
 
+    /**
+     * given the input text match the Token and return the length of
+     * the matched characters
+     * @param  text        input string
+     * @param  mathedToken a reference to the pointer to the Token instance,
+     * which will be modified by this function
+     * @return             On success, return the nubmer of mached characters;
+     * otherwise -1;
+     */
+    int matchToken(const char *text, Token *&matchedToken);
+
 private:
     // head and tail pointer for the list of Tokens
     Token *head;
@@ -110,17 +121,6 @@ private:
      * @return          On success, length of the matched string; otherwise -1;
      */
     int matchTokenType(const char *text, tokenType terminal);
-
-    /**
-     * given the input text match the Token and return the length of
-     * the matched characters
-     * @param  text        input string
-     * @param  mathedToken a reference to the pointer to the Token instance,
-     * which will be modified by this function
-     * @return             On success, return the nubmer of mached characters;
-     * otherwise -1;
-     */
-    int matchToken(const char *text, Token *&matchedToken);
 
     /**
      * match white space and comments, modified from WordCount.cpp

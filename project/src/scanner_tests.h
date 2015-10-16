@@ -59,162 +59,140 @@ public:
        shown in the comment above.
     */
 
-    void tokenMaker_tester(const char *text, const char *pattern,
-                           tokenType terminal, const char *lexeme_target) {
-        Token *head = s->scan(text);
+    void tokenMaker_tester(const char *text, tokenType terminal,
+                           const char *lexeme_target) {
+        Token *head;
+        s->matchToken(text, head);
         TS_ASSERT(head->lexeme == string(lexeme_target));
         TS_ASSERT(head->terminal == terminal);
+        delete head;
     }
 
-    void test_terminal_intKwd() {
-        tokenMaker_tester("int ", "^int", intKwd, "int");
-    }
+    void test_terminal_intKwd() { tokenMaker_tester("int ", intKwd, "int"); }
 
     void test_terminal_floatKwd() {
-        tokenMaker_tester("float ", "^float", floatKwd, "float");
+        tokenMaker_tester("float ", floatKwd, "float");
     }
 
     void test_terminal_stringKwd() {
-        tokenMaker_tester("string ", "^string", stringKwd, "string");
+        tokenMaker_tester("string ", stringKwd, "string");
     }
 
     void test_terminal_matrixKwd() {
-        tokenMaker_tester("matrix ", "^matrix", matrixKwd, "matrix");
+        tokenMaker_tester("matrix ", matrixKwd, "matrix");
     }
 
-    void test_terminal_letKwd() {
-        tokenMaker_tester("let ", "^let", letKwd, "let");
-    }
+    void test_terminal_letKwd() { tokenMaker_tester("let ", letKwd, "let"); }
 
-    void test_terminal_inKwd() { tokenMaker_tester("in ", "^in", inKwd, "in"); }
+    void test_terminal_inKwd() { tokenMaker_tester("in ", inKwd, "in"); }
 
-    void test_terminal_endKwd() {
-        tokenMaker_tester("end ", "^end", endKwd, "end");
-    }
+    void test_terminal_endKwd() { tokenMaker_tester("end ", endKwd, "end"); }
 
-    void test_terminal_ifKwd() { tokenMaker_tester("if ", "^if", ifKwd, "if"); }
+    void test_terminal_ifKwd() { tokenMaker_tester("if ", ifKwd, "if"); }
 
     void test_terminal_thenKwd() {
-        tokenMaker_tester("then ", "^then", thenKwd, "then");
+        tokenMaker_tester("then ", thenKwd, "then");
     }
 
     void test_terminal_elseKwd() {
-        tokenMaker_tester("else ", "^else", elseKwd, "else");
+        tokenMaker_tester("else ", elseKwd, "else");
     }
 
     void test_terminal_repeatKwd() {
-        tokenMaker_tester("repeat ", "^repeat", repeatKwd, "repeat");
+        tokenMaker_tester("repeat ", repeatKwd, "repeat");
     }
 
     void test_terminal_printKwd() {
-        tokenMaker_tester("print ", "^print", printKwd, "print");
+        tokenMaker_tester("print ", printKwd, "print");
     }
 
-    void test_terminal_toKwd() { tokenMaker_tester("to ", "^to", toKwd, "to"); }
+    void test_terminal_toKwd() { tokenMaker_tester("to ", toKwd, "to"); }
 
     void test_terminal_intConst() {
-        tokenMaker_tester("132169080;", "^[0-9]+", intConst, "132169080");
+        tokenMaker_tester("132169080;", intConst, "132169080");
     }
 
     void test_terminal_floatConst() {
-        tokenMaker_tester("0.0;", "^[0-9]+\\.[0-9]+", floatConst, "0.0");
-        tokenMaker_tester("1.234;", "^[0-9]+\\.[0-9]+", floatConst, "1.234");
+        tokenMaker_tester("0.0;", floatConst, "0.0");
+        tokenMaker_tester("1.234;", floatConst, "1.234");
     }
 
     void test_terminal_stringConst() {
-        tokenMaker_tester("\"asdfdasf\";", "^\"[^\"]*\"", stringConst,
-                          "\"asdfdasf\"");
+        tokenMaker_tester("\"asdfdasf\";", stringConst, "\"asdfdasf\"");
     }
 
     void test_terminal_variableName() {
-        tokenMaker_tester("_00_abDA__997 ", "^[_a-zA-Z]+[_a-zA-Z0-9]*",
-                          variableName, "_00_abDA__997");
+        tokenMaker_tester("_00_abDA__997 ", variableName, "_00_abDA__997");
     }
 
-    void test_terminal_leftParen() {
-        tokenMaker_tester("( ", "^\\(", leftParen, "(");
-    }
+    void test_terminal_leftParen() { tokenMaker_tester("( ", leftParen, "("); }
 
     void test_terminal_rightParen() {
-        tokenMaker_tester(") ", "^\\)", rightParen, ")");
+        tokenMaker_tester(") ", rightParen, ")");
     }
 
-    void test_terminal_leftCurly() {
-        tokenMaker_tester("{ ", "^\\{", leftCurly, "{");
-    }
+    void test_terminal_leftCurly() { tokenMaker_tester("{ ", leftCurly, "{"); }
 
     void test_terminal_rightCurly() {
-        tokenMaker_tester("};", "^\\}", rightCurly, "}");
+        tokenMaker_tester("};", rightCurly, "}");
     }
 
     void test_terminal_leftSquare() {
-        tokenMaker_tester("[ ", "^\\[", leftSquare, "[");
+        tokenMaker_tester("[ ", leftSquare, "[");
     }
 
     void test_terminal_rightSquare() {
-        tokenMaker_tester("];", "^\\]", rightSquare, "]");
+        tokenMaker_tester("];", rightSquare, "]");
     }
 
-    void test_terminal_semiColon() {
-        tokenMaker_tester(";\n", "^;", semiColon, ";");
-    }
+    void test_terminal_semiColon() { tokenMaker_tester(";\n", semiColon, ";"); }
 
-    void test_terminal_colon() { tokenMaker_tester(": ", "^:", colon, ":"); }
+    void test_terminal_colon() { tokenMaker_tester(": ", colon, ":"); }
 
-    void test_terminal_assign() { tokenMaker_tester("= ", "^=", assign, "="); }
+    void test_terminal_assign() { tokenMaker_tester("= ", assign, "="); }
 
-    void test_terminal_plusSign() {
-        tokenMaker_tester("+ ", "^\\+", plusSign, "+");
-    }
+    void test_terminal_plusSign() { tokenMaker_tester("+ ", plusSign, "+"); }
 
-    void test_terminal_star() { tokenMaker_tester("* ", "^\\*", star, "*"); }
+    void test_terminal_star() { tokenMaker_tester("* ", star, "*"); }
 
-    void test_terminal_dash() { tokenMaker_tester("- ", "-", dash, "-"); }
+    void test_terminal_dash() { tokenMaker_tester("- ", dash, "-"); }
 
     void test_terminal_forwardSlash() {
-        tokenMaker_tester("/ ", "/", forwardSlash, "/");
+        tokenMaker_tester("/ ", forwardSlash, "/");
     }
 
-    void test_terminal_lessThan() {
-        tokenMaker_tester("< ", "<", lessThan, "<");
-    }
+    void test_terminal_lessThan() { tokenMaker_tester("< ", lessThan, "<"); }
 
     void test_terminal_lessThanEqual() {
-        tokenMaker_tester("<= ", "<=", lessThanEqual, "<=");
+        tokenMaker_tester("<= ", lessThanEqual, "<=");
     }
 
     void test_terminal_greaterThan() {
-        tokenMaker_tester("> ", ">", greaterThan, ">");
+        tokenMaker_tester("> ", greaterThan, ">");
     }
 
     void test_terminal_greaterThanEqual() {
-        tokenMaker_tester(">= ", ">=", greaterThanEqual, ">=");
+        tokenMaker_tester(">= ", greaterThanEqual, ">=");
     }
 
     void test_terminal_equalsEquals() {
-        tokenMaker_tester("== ", "==", equalsEquals, "==");
+        tokenMaker_tester("== ", equalsEquals, "==");
     }
 
     void test_terminal_notEquals() {
-        tokenMaker_tester("!= ", "!=", notEquals, "!=");
+        tokenMaker_tester("!= ", notEquals, "!=");
     }
 
-    void test_terminal_andOp() {
-        tokenMaker_tester("&& ", "\\&\\&", andOp, "&&");
-    }
+    void test_terminal_andOp() { tokenMaker_tester("&& ", andOp, "&&"); }
 
-    void test_terminal_orOp() {
-        tokenMaker_tester("|| ", "\\|\\|", orOp, "||");
-    }
+    void test_terminal_orOp() { tokenMaker_tester("|| ", orOp, "||"); }
 
-    void test_terminal_notOp() { tokenMaker_tester("! ", "!", notOp, "!"); }
+    void test_terminal_notOp() { tokenMaker_tester("! ", notOp, "!"); }
 
-    void test_terminal_endOfFile() {
-        tokenMaker_tester("", "\\|\\|", endOfFile, "");
-    }
+    void test_terminal_endOfFile() { tokenMaker_tester("", endOfFile, ""); }
 
     void test_terminal_lexicalError() {
-        tokenMaker_tester("##", "", lexicalError, "#");
+        tokenMaker_tester("##", lexicalError, "#");
     }
 
     // Tests for "scan"

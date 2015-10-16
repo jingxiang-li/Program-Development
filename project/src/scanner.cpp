@@ -11,8 +11,9 @@ Token::Token(string lexeme, tokenType terminal, Token *next) {
     this->terminal = terminal;
     this->next = next;
 }
+
 /**
- * These are fuctions that take in text and match with regular expressions 
+ * These are fuctions that take in text and match with regular expressions
  * and return the lenghth of the matching string.
  */
 int Scanner::matchTokenType(const char *text, tokenType terminal) {
@@ -145,8 +146,8 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
         case notOp:
             re = makeRegex("^!");
             break;
-            
-        //Special Terminal Types
+
+        // Special Terminal Types
         case endOfFile:
             // re = makeRegex("^$");
             if (strlen(text) == 0)
