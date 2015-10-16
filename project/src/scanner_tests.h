@@ -161,53 +161,62 @@ public:
 
     void test_terminal_colon() { tokenMaker_tester(": ", "^:", colon, ":"); }
 
-    void xtest_terminal_assign() { tokenMaker_tester("= ", "^=", assign, "="); }
+    void test_terminal_assign() { tokenMaker_tester("= ", "^=", assign, "="); }
 
-    void xtest_terminal_plusSign() {
+    void test_terminal_plusSign() {
         tokenMaker_tester("+ ", "^\\+", plusSign, "+");
     }
 
-    void xtest_terminal_star() { tokenMaker_tester("* ", "^\\*", star, "*"); }
+    void test_terminal_star() { tokenMaker_tester("* ", "^\\*", star, "*"); }
 
-    void xtest_terminal_dash() { tokenMaker_tester("- ", "-", dash, "-"); }
+    void test_terminal_dash() { tokenMaker_tester("- ", "-", dash, "-"); }
 
-    void xtest_terminal_forwardSlash() {
+    void test_terminal_forwardSlash() {
         tokenMaker_tester("/ ", "/", forwardSlash, "/");
     }
 
-    void xtest_terminal_lessThan() {
+    void test_terminal_lessThan() {
         tokenMaker_tester("< ", "<", lessThan, "<");
     }
 
-    void xtest_terminal_lessThanEqual() {
+    void test_terminal_lessThanEqual() {
         tokenMaker_tester("<= ", "<=", lessThanEqual, "<=");
     }
 
-    void xtest_terminal_greaterThan() {
+    void test_terminal_greaterThan() {
         tokenMaker_tester("> ", ">", greaterThan, ">");
     }
 
-    void xtest_terminal_greaterThanEqual() {
+    void test_terminal_greaterThanEqual() {
         tokenMaker_tester(">= ", ">=", greaterThanEqual, ">=");
     }
 
-    void xtest_terminal_equalsEquals() {
+    void test_terminal_equalsEquals() {
         tokenMaker_tester("== ", "==", equalsEquals, "==");
     }
 
-    void xtest_terminal_notEquals() {
+    void test_terminal_notEquals() {
         tokenMaker_tester("!= ", "!=", notEquals, "!=");
     }
 
-    void xtest_terminal_andOp() {
+    void test_terminal_andOp() {
         tokenMaker_tester("&& ", "\\&\\&", andOp, "&&");
     }
 
-    void xtest_terminal_orOp() {
+    void test_terminal_orOp() {
         tokenMaker_tester("|| ", "\\|\\|", orOp, "||");
     }
 
-    void xtest_terminal_notOp() { tokenMaker_tester("! ", "!", notOp, "!"); }
+    void test_terminal_notOp() { tokenMaker_tester("! ", "!", notOp, "!"); }
+    
+    
+     void test_terminal_endOfFile() {
+        tokenMaker_tester("", "\\|\\|", endOfFile, "");
+    }
+
+     void test_terminal_lexicalError() {
+        tokenMaker_tester("##","", lexcialError, "#");
+    }
 
     // Tests for "scan"
     // --------------------------------------------------
