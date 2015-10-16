@@ -6,13 +6,13 @@
 using namespace std;
 
 Token::Token(string lexeme, tokenType terminal, Token *next) {
-    cout << "Token is created, lexeme is " << lexeme << endl;
+    // cout << "Token is created, lexeme is " << lexeme << endl;
     this->lexeme = lexeme;
     this->terminal = terminal;
     this->next = next;
 }
 
-int Scanner::matchTokenType(char *text, tokenType terminal) {
+int Scanner::matchTokenType(const char *text, tokenType terminal) {
     regex_t *re = NULL;
     int numMatchedChars = 0;
     switch (terminal) {
@@ -99,7 +99,6 @@ int Scanner::matchTokenType(char *text, tokenType terminal) {
             re = makeRegex("^:");
             break;
 
-
         case endOfFile:
             // re = makeRegex("^$");
             if (strlen(text) == 0)
@@ -122,7 +121,7 @@ int Scanner::matchTokenType(char *text, tokenType terminal) {
     return numMatchedChars;
 }
 
-int Scanner::consumeWhiteSpaceAndComments(char *text) {
+int Scanner::consumeWhiteSpaceAndComments(const char *text) {
     regex_t *whiteSpace = makeRegex("^[\n\t\r ]+");
     regex_t *blockComment = makeRegex("^/\\*([^\\*]|\\*+[^\\*/])*\\*+/");
     regex_t *lineComment = makeRegex("^//[^\n]*\n");
@@ -162,7 +161,7 @@ int Scanner::consumeWhiteSpaceAndComments(char *text) {
     return totalNumMatchedChars;
 }
 
-int Scanner::matchToken(char *text, Token *&matchedToken) {
+int Scanner::matchToken(const char *text, Token *&matchedToken) {
     /**
      * iterate through all tokens by using a for loop and find the one
      * that gives the maximum match length. Note that the order of
@@ -183,6 +182,7 @@ int Scanner::matchToken(char *text, Token *&matchedToken) {
             // this is strictly larger than, if we have two match with
             // same length then priority is given to the first one
             // that was tried.
+
             maxNumMatchedChars = numMatchedChars;
             matchedType = currentType;
         }
@@ -194,7 +194,7 @@ int Scanner::matchToken(char *text, Token *&matchedToken) {
         return -1;
     }
 
-    string lexeme(text, text + maxNumMatchedChars);
+    string lexeme(text, 0, maxNumMatchedChars);
     tokenType terminal = matchedType;
     matchedToken = new Token(lexeme, terminal, NULL);
 
@@ -206,7 +206,7 @@ int Scanner::matchToken(char *text, Token *&matchedToken) {
     return maxNumMatchedChars;
 }
 
-Token *Scanner::makeTokenList(char *text) {
+Token *Scanner::makeTokenList(const char *text) {
     // int totalLength = strlen(text);
     head = NULL;
     tail = NULL;
@@ -235,6 +235,4 @@ Token *Scanner::makeTokenList(char *text) {
     return head;
 }
 
-Token *Scanner::scan(char *text) {
-    return makeTokenList(text);
-}
+Token *Scanner::scan(const char *text) { return makeTokenList(text); }

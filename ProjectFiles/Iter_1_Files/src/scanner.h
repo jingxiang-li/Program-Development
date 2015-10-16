@@ -88,7 +88,7 @@ public:
      * @return      On success, a pointer pointing to the head of the list of
      * Tokens; otherwise NULL
      */
-    Token *scan(char *text);
+    Token *scan(const char *text);
 
 private:
     // head and tail pointer for the list of Tokens
@@ -102,7 +102,7 @@ private:
      * @param  terminal the type of token
      * @return          On success, length of the matched string; otherwise -1;
      */
-    int matchTokenType(char *text, tokenType terminal);
+    int matchTokenType(const char *text, tokenType terminal);
 
     /**
      * given the input text match the Token and return the length of
@@ -113,14 +113,14 @@ private:
      * @return             On success, return the nubmer of mached characters;
      * otherwise -1;
      */
-    int matchToken(char *text, Token *&matchedToken);
+    int matchToken(const char *text, Token *&matchedToken);
 
     /**
      * match white space and comments, modified from WordCount.cpp
      * @param  text input text
      * @return      the length of string that contains space or comments
      */
-    int consumeWhiteSpaceAndComments(char *text);
+    int consumeWhiteSpaceAndComments(const char *text);
 
     /**
      * make a list of Tokens given the input text, head and tail will be
@@ -129,7 +129,7 @@ private:
      * @return      on success, return the pointer to the head of the list;
      * otherwise NULL
      */
-    Token *makeTokenList(char *text);
+    Token *makeTokenList(const char *text);
 };
 
 #endif /* SCANNER_H */

@@ -29,7 +29,7 @@ regex_t * makeRegex (const char* pattern) {
 
         delete re ;
         return NULL;
-    } 
+    }
     else
         return re ;
 }
@@ -44,7 +44,7 @@ int matchRegex (regex_t *re, const char *text) {
      matches, the beginning and ending of the matched text are stored
      in the first element of the matches array.
    */
-    status = regexec(re, text, (size_t)nsub, matches, 0); 
+    status = regexec(re, text, (size_t)nsub, matches, 0);
 
     if (status==REG_NOMATCH) {
         return 0 ;
