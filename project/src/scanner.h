@@ -99,8 +99,8 @@ public:
 
 private:
     // head and tail pointer for the list of Tokens
-    Token *head = NULL;
-    Token *tail = NULL;
+    Token *head;
+    Token *tail;
 
     /**
      * given the input text and the token type, return the length of the
