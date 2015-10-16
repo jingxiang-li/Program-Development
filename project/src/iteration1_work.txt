@@ -1,0 +1,6 @@
+Tanoja Sunkam 4360668
+Jingxiang Li  5095269
+
+In the scanner.cpp file, my partner and I split up the work by sharing the work for writing the different regular expresssions. Jingxiang wrote the fuctions for the first half such as different types of constants, names and punctuations and I wrote the functions for the second half such as operators and special terminal types.
+For the scanner_tests.h, my partner and I wrote the test cases for the same fuctions we wrote in scanner.cpp. 
+The rest of the design work we worked collaboratively. 
