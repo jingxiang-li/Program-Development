@@ -98,7 +98,47 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
         case colon:
             re = makeRegex("^:");
             break;
-
+        
+             // Operators
+        case assign:
+            re = makeRegex("^\\=");
+            break;
+        case plussign:
+            re = makeRegex("^\\+");
+            break;
+        case star:
+            re = makeRegex("^\\*");
+            break;
+        case dash:
+            re = makeRegex("^\\-");
+            break;
+        case forwardslash:
+            re = makeRegex("^/");
+            break;
+        case lessThan:
+            re = makeRegex("^<");
+            break;
+        case lessThanEqual:
+            re = makeRegex("^<=");
+            break;
+        case greaterThan:
+            re = makeRegex("^>");
+            break;
+        case greaterThanEqual:
+            re = makeRegex("^>=");
+            break;
+        case equalsEquals:
+            re = makeRegex("^==");
+            break;
+        case notEquals:
+            re = makeRegex("^!=");
+            break;
+        case andOp:
+            re = makeRegex("^&&");
+            break;
+        case notOp:
+            re = makeRegex("^!");
+            break;
         case endOfFile:
             // re = makeRegex("^$");
             if (strlen(text) == 0)
@@ -106,7 +146,6 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
             else
                 return 0;
             break;
-
         default:
             return 0;
     }
@@ -173,7 +212,7 @@ int Scanner::matchToken(const char *text, Token *&matchedToken) {
     int maxNumMatchedChars = -1;
     tokenType matchedType = lexicalError;
 
-    for (int tokenTypeIndex = intKwd; tokenTypeIndex <= lexicalError;
+    for (int tokenTypeIndex = intKwd; tokenTypeIndex < lexicalError;
          tokenTypeIndex++) {
         tokenType currentType = static_cast<tokenType>(tokenTypeIndex);
         int numMatchedChars = matchTokenType(text, currentType);
@@ -193,6 +232,11 @@ int Scanner::matchToken(const char *text, Token *&matchedToken) {
              << endl;
         return -1;
     }
+    
+    if (maxNumMatchedChars == 0) {
+    	 matchedType = lexicalError;
+    	 maxNumMatchedChars == 1;
+        }
 
     string lexeme(text, 0, maxNumMatchedChars);
     tokenType terminal = matchedType;
