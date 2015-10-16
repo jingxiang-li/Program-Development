@@ -208,14 +208,13 @@ public:
     }
 
     void test_terminal_notOp() { tokenMaker_tester("! ", "!", notOp, "!"); }
-    
-    
-     void test_terminal_endOfFile() {
+
+    void test_terminal_endOfFile() {
         tokenMaker_tester("", "\\|\\|", endOfFile, "");
     }
 
-     void test_terminal_lexicalError() {
-        tokenMaker_tester("##","", lexcialError, "#");
+    void test_terminal_lexicalError() {
+        tokenMaker_tester("##", "", lexicalError, "#");
     }
 
     // Tests for "scan"
@@ -283,14 +282,14 @@ public:
     */
 
     // The "endOfFile" token is always the last one in the list of tokens.
-    void xtest_scan_empty() {
+    void test_scan_empty() {
         Token *tks = s->scan("  ");
         TS_ASSERT(tks != NULL);
         TS_ASSERT_EQUALS(tks->terminal, endOfFile);
         TS_ASSERT(tks->next == NULL);
     }
 
-    void xtest_scan_empty_comment() {
+    void test_scan_empty_comment() {
         Token *tks = s->scan(" /* a comment */ ");
         TS_ASSERT(tks != NULL);
         TS_ASSERT_EQUALS(tks->terminal, endOfFile);
@@ -299,7 +298,7 @@ public:
 
     // When a lexical error occurs, the scanner creates a token with a
     // single-character lexeme and lexicalError as the terminal.
-    void xtest_scan_lexicalErrors() {
+    void test_scan_lexicalErrors() {
         Token *tks = s->scan("$&1  ");
         TS_ASSERT(tks != NULL);
         TS_ASSERT_EQUALS(tks->terminal, lexicalError);
@@ -319,7 +318,7 @@ public:
     }
 
     // A test for scanning numbers and a variable.
-    void xtest_scan_nums_vars() {
+    void test_scan_nums_vars() {
         Token *tks = s->scan(" 123 x 12.34 ");
         TS_ASSERT(tks != NULL);
         tokenType ts[] = {intConst, variableName, floatConst, endOfFile};
@@ -331,7 +330,7 @@ public:
        are correct.
      */
 
-    void xtest_scan_bad_syntax_good_tokens() {
+    void test_scan_bad_syntax_good_tokens() {
         const char *filename = "../samples/bad_syntax_good_tokens.dsl";
         char *text = readInputFromFile(filename);
         TS_ASSERT(text);
@@ -362,7 +361,7 @@ public:
         TS_ASSERT(sameTerminals(tks, count, ts));
     }
 
-    void xtest_scan_sample_forestLoss() {
+    void test_scan_sample_forestLoss() {
         scanFileNoLexicalErrors("../samples/forest_loss_v2.dsl");
     }
 };

@@ -98,12 +98,12 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
         case colon:
             re = makeRegex("^:");
             break;
-        
-             // Operators
+
+        // Operators
         case assign:
             re = makeRegex("^\\=");
             break;
-        case plussign:
+        case plusSign:
             re = makeRegex("^\\+");
             break;
         case star:
@@ -112,7 +112,7 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
         case dash:
             re = makeRegex("^\\-");
             break;
-        case forwardslash:
+        case forwardSlash:
             re = makeRegex("^/");
             break;
         case lessThan:
@@ -135,6 +135,9 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
             break;
         case andOp:
             re = makeRegex("^&&");
+            break;
+        case orOp:
+            re = makeRegex("^\\|\\|");
             break;
         case notOp:
             re = makeRegex("^!");
@@ -232,11 +235,11 @@ int Scanner::matchToken(const char *text, Token *&matchedToken) {
              << endl;
         return -1;
     }
-    
+
     if (maxNumMatchedChars == 0) {
-    	 matchedType = lexicalError;
-    	 maxNumMatchedChars == 1;
-        }
+        matchedType = lexicalError;
+        maxNumMatchedChars = 1;
+    }
 
     string lexeme(text, 0, maxNumMatchedChars);
     tokenType terminal = matchedType;
