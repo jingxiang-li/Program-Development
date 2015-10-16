@@ -10,6 +10,9 @@ using namespace std;
 /* This enumerated type is used to keep track of what kind of
    construct was matched.
  */
+ 
+/* This is just a sample comment
+*/
 
 enum tokenEnumType {
 
