@@ -2,7 +2,7 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
-#include <regex.h>
+#include "./regex.h"
 #include <string>
 
 using namespace std;

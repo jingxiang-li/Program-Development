@@ -1,11 +1,11 @@
-#include <cxxtest/TestSuite.h>
-
+#include "./regex.h"
 #include "readInput.h"
 #include "scanner.h"
-#include "./regex.h"
+#include <cstring>
+#include <cxxtest/TestSuite.h>
 #include <stdio.h>
 #include <string>
-#include <cstring>
+
 using namespace std;
 
 class ScannerTestSuite : public CxxTest::TestSuite {

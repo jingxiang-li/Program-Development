@@ -1,7 +1,7 @@
-#include "scanner.h"
-#include <iostream>
-#include "string.h"
 #include "./regex.h"
+#include "scanner.h"
+#include "string.h"
+#include <iostream>
 
 using namespace std;
 
@@ -11,6 +11,7 @@ Token::Token(string lexeme, tokenType terminal, Token *next) {
     this->terminal = terminal;
     this->next = next;
 }
+
 
 /**
  * These are fuctions that take in text and match with regular expressions

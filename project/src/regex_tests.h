@@ -1,9 +1,10 @@
-#include <cxxtest/TestSuite.h>
 #include "regex.h"
+#include <cxxtest/TestSuite.h>
+#include <string>
 
 using namespace std ;
 
-class RegexTestSuite : public CxxTest::TestSuite 
+class RegexTestSuite : public CxxTest::TestSuite
 {
 public:
 
