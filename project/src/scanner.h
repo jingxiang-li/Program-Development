@@ -14,6 +14,9 @@ enum tokenEnumType {
 
     intKwd,
     floatKwd,
+    boolKwd,
+    trueKwd,
+    falseKwd,
     stringKwd,
     matrixKwd,
     letKwd,
@@ -23,6 +26,7 @@ enum tokenEnumType {
     thenKwd,
     elseKwd,
     repeatKwd,
+    whileKwd,
     printKwd,
     toKwd,
 
@@ -41,7 +45,6 @@ enum tokenEnumType {
     rightCurly,
     leftSquare,
     rightSquare,
-
     semiColon,
     colon,
 
