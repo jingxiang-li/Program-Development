@@ -65,7 +65,7 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
             re = makeRegex("^repeat");
             break;
         case whileKwd:
-            re = makeRegex("^whlie");
+            re = makeRegex("^while");
             break;
         case printKwd:
             re = makeRegex("^print");

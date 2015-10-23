@@ -74,6 +74,18 @@ public:
         tokenMaker_tester("float ", floatKwd, "float");
     }
 
+    void test_terminal_boolKwd() {
+        tokenMaker_tester("bool ", boolKwd, "bool");
+    }
+
+    void test_terminal_trueKwd() {
+        tokenMaker_tester("true ", trueKwd, "true");
+    }
+
+    void test_terminal_falseKwd() {
+        tokenMaker_tester("false ", falseKwd, "false");
+    }
+
     void test_terminal_stringKwd() {
         tokenMaker_tester("string ", stringKwd, "string");
     }
@@ -100,6 +112,10 @@ public:
 
     void test_terminal_repeatKwd() {
         tokenMaker_tester("repeat ", repeatKwd, "repeat");
+    }
+
+    void test_terminal_whileKwd() {
+        tokenMaker_tester("while ", whileKwd, "while");
     }
 
     void test_terminal_printKwd() {
