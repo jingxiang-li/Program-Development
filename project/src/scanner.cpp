@@ -28,6 +28,15 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
         case floatKwd:
             re = makeRegex("^float");
             break;
+        case boolKwd:
+            re = makeRegex("^bool");
+            break;
+        case trueKwd:
+            re = makeRegex("^true");
+            break;
+        case falseKwd:
+            re = makeRegex("^false");
+            break;
         case stringKwd:
             re = makeRegex("^string");
             break;
@@ -54,6 +63,9 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
             break;
         case repeatKwd:
             re = makeRegex("^repeat");
+            break;
+        case whileKwd:
+            re = makeRegex("^whlie");
             break;
         case printKwd:
             re = makeRegex("^print");
