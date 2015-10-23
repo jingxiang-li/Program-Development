@@ -1,6 +1,9 @@
-int result = 1;
-int num = 1;
-boolean flag = true;
+int result;
+result = 1;
+int num;
+num = 1;
+boolean flag;
+flag = true;
 
 while (flag) {
 	result = result * num;
