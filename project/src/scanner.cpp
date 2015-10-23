@@ -29,7 +29,7 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
             re = makeRegex("^float");
             break;
         case boolKwd:
-            re = makeRegex("^bool");
+            re = makeRegex("^boolean");
             break;
         case trueKwd:
             re = makeRegex("^true");

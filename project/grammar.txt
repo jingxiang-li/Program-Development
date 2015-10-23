@@ -9,11 +9,13 @@ Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
 Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr ';'	
 Stmt ::= 'print' '(' Expr ')' ';'
 Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
+Stmt ::= 'while' '(' Expr ')' Stmt
 Stmt ::= ';'
 
 Decl ::= 'int' varName ';'
 Decl ::= 'float' varName ';'
 Decl ::= 'string' varName ';'
+Decl ::= 'boolean' varName ';'
 
 Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '=' Expr ';'
 Decl ::= 'matrix' varName '=' Expr ';'

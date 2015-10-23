@@ -75,7 +75,7 @@ public:
     }
 
     void test_terminal_boolKwd() {
-        tokenMaker_tester("bool ", boolKwd, "bool");
+        tokenMaker_tester("boolean ", boolKwd, "boolean");
     }
 
     void test_terminal_trueKwd() {
