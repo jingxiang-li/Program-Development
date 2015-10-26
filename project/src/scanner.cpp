@@ -12,10 +12,12 @@ Token::Token(string lexeme, tokenType terminal, Token *next) {
     this->next = next;
 }
 
-
 /**
- * These are fuctions that take in text and match with regular expressions
- * and return the lenghth of the matching string.
+ * given the input text and the token type, return the length of the
+ * matched string
+ * @param  text     input string
+ * @param  terminal the type of token
+ * @return          On success, length of the matched string; otherwise -1;
  */
 int Scanner::matchTokenType(const char *text, tokenType terminal) {
     regex_t *re = NULL;
@@ -182,6 +184,11 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
     return numMatchedChars;
 }
 
+/**
+ * match white space and comments, modified from WordCount.cpp
+ * @param  text input text
+ * @return      the length of string that contains space or comments
+ */
 int Scanner::consumeWhiteSpaceAndComments(const char *text) {
     regex_t *whiteSpace = makeRegex("^[\n\t\r ]+");
     regex_t *blockComment = makeRegex("^/\\*([^\\*]|\\*+[^\\*/])*\\*+/");
@@ -222,6 +229,15 @@ int Scanner::consumeWhiteSpaceAndComments(const char *text) {
     return totalNumMatchedChars;
 }
 
+/**
+ * given the input text match the Token and return the length of
+ * the matched characters
+ * @param  text        input string
+ * @param  mathedToken a reference to the pointer to the Token instance,
+ * which will be modified by this function
+ * @return             On success, return the nubmer of mached characters;
+ * otherwise -1;
+ */
 int Scanner::matchToken(const char *text, Token *&matchedToken) {
     /**
      * iterate through all tokens by using a for loop and find the one
@@ -272,6 +288,13 @@ int Scanner::matchToken(const char *text, Token *&matchedToken) {
     return maxNumMatchedChars;
 }
 
+/**
+ * make a list of Tokens given the input text, head and tail will be
+ * modified after calling this function
+ * @param  text input string
+ * @return      on success, return the pointer to the head of the list;
+ * otherwise NULL
+ */
 Token *Scanner::makeTokenList(const char *text) {
     // int totalLength = strlen(text);
     head = NULL;
@@ -301,4 +324,10 @@ Token *Scanner::makeTokenList(const char *text) {
     return head;
 }
 
+/**
+ * scan the input text and return a list of Tokens parsed from the text
+ * @param  text input string
+ * @return      On success, a pointer pointing to the head of the list of
+ * Tokens; otherwise NULL
+ */
 Token *Scanner::scan(const char *text) { return makeTokenList(text); }

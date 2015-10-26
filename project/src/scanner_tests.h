@@ -59,6 +59,13 @@ public:
        shown in the comment above.
     */
 
+    /**
+     * A helper function for us to test the regular expression
+     * for each Tokentype
+     * @param text          input text
+     * @param terminal      target Tokentype
+     * @param lexeme_target target matched string
+     */
     void tokenMaker_tester(const char *text, tokenType terminal,
                            const char *lexeme_target) {
         Token *head;
@@ -67,6 +74,10 @@ public:
         TS_ASSERT(head->terminal == terminal);
         delete head;
     }
+
+    /**
+     * Below are the tests for each Tokentype
+     */
 
     void test_terminal_intKwd() { tokenMaker_tester("int ", intKwd, "int"); }
 
