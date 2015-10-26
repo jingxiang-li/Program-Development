@@ -1,0 +1,6 @@
+Tanoja Sunkam Sunka004
+Jingxiang Li Lixx3899
+
+Due Date: Fri 10/30/15
+
+We both worked together to update scanner.cpp, Makefile, and scanner_tests.h files.
