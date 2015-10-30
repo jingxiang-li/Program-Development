@@ -1,0 +1,25 @@
+Tanoja Sunkam Sunka004
+Jingxiang Li Lixx3899
+
+Question 1:
+Is there any duplication in the testing code you've written to test individual token regular expressions and the code used by scan?
+No there is not any duplication in the testing code we have written to test individual token regular expressions and the code
+by scan.
+
+Question 2:
+Yes our scan function does make calls to makeRegex every time it is called.
+This initialization should be done inside the class Scanner and we can make a static array of regular expressions.
+
+Question 3:
+No we do not have a redundant array of tokenTye values because it is unecessary and just repeats the tokenEnumType enumerator. Also these types can be made into integers so we do not have to make them into an array to access them.
+
+Question 4:
+Yes changing the order of intkwd and printkwd in the definition of enum tokenEnumType in scanner.h will have an adverse effect on the rest of the code.
+The change that needs to be made to prevent this from happening is that in the for loops for all tokenTypeIndexes the initial index needs to be changed to 0 in place of intKwd.
+
+Question 5:
+No we did not create a named regex_t pointer for each regex instead of only putting them in an array.
+No the expressions are not necessary and we can get rid of these.
+
+Question 6:
+No there are no places in which enumerated tokenTYpe values should be used instead of integer liter
