@@ -250,7 +250,7 @@ int Scanner::matchToken(const char *text, Token *&matchedToken) {
     int maxNumMatchedChars = -1;
     tokenType matchedType = lexicalError;
 
-    for (int tokenTypeIndex = intKwd; tokenTypeIndex < lexicalError;
+    for (int tokenTypeIndex = 0; tokenTypeIndex < lexicalError;
          tokenTypeIndex++) {
         tokenType currentType = static_cast<tokenType>(tokenTypeIndex);
         int numMatchedChars = matchTokenType(text, currentType);

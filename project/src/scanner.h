@@ -13,7 +13,7 @@ using namespace std;
  */
 enum tokenEnumType {
 
-    intKwd,
+    printKwd,
     floatKwd,
     boolKwd,
     trueKwd,
@@ -28,7 +28,7 @@ enum tokenEnumType {
     elseKwd,
     repeatKwd,
     whileKwd,
-    printKwd,
+    intKwd,
     toKwd,
 
     // Constants
