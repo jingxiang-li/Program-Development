@@ -83,8 +83,8 @@ public:
     tokenType terminal;
     Token *next;
 
+    // Constructor for Token, initialize lexeme, terminal and next pointer
     Token(string lexeme, tokenType terminal, Token *next);
-    // ~Token();
 };
 
 /**
@@ -93,6 +93,13 @@ public:
  */
 class Scanner {
 public:
+
+    /**
+     * Constructor for Scanner, initialize head, tail and regex_array
+     * by calling initializeRegex()
+     */
+    Scanner();
+
     /**
      * scan the input text and return a list of Tokens parsed from the text
      * @param  text input string
@@ -118,6 +125,14 @@ private:
     Token *tail;
 
     /**
+     * array of regular expressions for each tokenType,
+     * with length "lexicalError", it will be initialized
+     * in the constructor of Scanner by calling function
+     * initializeRegex()
+     */
+    regex_t **regex_array;
+
+    /**
      * given the input text and the token type, return the length of the
      * matched string
      * @param  text     input string
@@ -141,6 +156,12 @@ private:
      * otherwise NULL
      */
     Token *makeTokenList(const char *text);
+
+    /**
+     * initialize the regex_array, this function will be called
+     * in the constructor of Scanner
+     */
+    void initializeRegex();
 };
 
 #endif /* SCANNER_H */

@@ -5,11 +5,22 @@
 
 using namespace std;
 
+// Constructor for Token, initialize lexeme, terminal and next pointer
 Token::Token(string lexeme, tokenType terminal, Token *next) {
     // cout << "Token is created, lexeme is " << lexeme << endl;
     this->lexeme = lexeme;
     this->terminal = terminal;
     this->next = next;
+}
+
+/**
+ * Constructor for Scanner, initialize head, tail and regex_array
+ * by calling initializeRegex()
+ */
+Scanner::Scanner() {
+    this->head = NULL;
+    this->tail = NULL;
+    initializeRegex();
 }
 
 /**
@@ -22,157 +33,17 @@ Token::Token(string lexeme, tokenType terminal, Token *next) {
 int Scanner::matchTokenType(const char *text, tokenType terminal) {
     regex_t *re = NULL;
     int numMatchedChars = 0;
-    switch (terminal) {
-        // keywords
-        case intKwd:
-            re = makeRegex("^int");
-            break;
-        case floatKwd:
-            re = makeRegex("^float");
-            break;
-        case boolKwd:
-            re = makeRegex("^boolean");
-            break;
-        case trueKwd:
-            re = makeRegex("^true");
-            break;
-        case falseKwd:
-            re = makeRegex("^false");
-            break;
-        case stringKwd:
-            re = makeRegex("^string");
-            break;
-        case matrixKwd:
-            re = makeRegex("^matrix");
-            break;
-        case letKwd:
-            re = makeRegex("^let");
-            break;
-        case inKwd:
-            re = makeRegex("^in");
-            break;
-        case endKwd:
-            re = makeRegex("^end");
-            break;
-        case ifKwd:
-            re = makeRegex("^if");
-            break;
-        case thenKwd:
-            re = makeRegex("^then");
-            break;
-        case elseKwd:
-            re = makeRegex("^else");
-            break;
-        case repeatKwd:
-            re = makeRegex("^repeat");
-            break;
-        case whileKwd:
-            re = makeRegex("^while");
-            break;
-        case printKwd:
-            re = makeRegex("^print");
-            break;
-        case toKwd:
-            re = makeRegex("^to");
-            break;
 
-        // constants
-        case intConst:
-            re = makeRegex("^[0-9]+");
-            break;
-        case floatConst:
-            re = makeRegex("^[0-9]+\\.[0-9]+");
-            break;
-        case stringConst:
-            re = makeRegex("^\"[^\"]*\"");
-            break;
-
-        // Names
-        case variableName:
-            re = makeRegex("^[_a-zA-Z]+[_a-zA-Z0-9]*");
-            break;
-
-        // Punctuation
-        case leftParen:
-            re = makeRegex("^\\(");
-            break;
-        case rightParen:
-            re = makeRegex("^\\)");
-            break;
-        case leftCurly:
-            re = makeRegex("^\\{");
-            break;
-        case rightCurly:
-            re = makeRegex("^\\}");
-            break;
-        case leftSquare:
-            re = makeRegex("^\\[");
-            break;
-        case rightSquare:
-            re = makeRegex("^\\]");
-            break;
-        case semiColon:
-            re = makeRegex("^;");
-            break;
-        case colon:
-            re = makeRegex("^:");
-            break;
-
-        // Operators
-        case assign:
-            re = makeRegex("^\\=");
-            break;
-        case plusSign:
-            re = makeRegex("^\\+");
-            break;
-        case star:
-            re = makeRegex("^\\*");
-            break;
-        case dash:
-            re = makeRegex("^\\-");
-            break;
-        case forwardSlash:
-            re = makeRegex("^/");
-            break;
-        case lessThan:
-            re = makeRegex("^<");
-            break;
-        case lessThanEqual:
-            re = makeRegex("^<=");
-            break;
-        case greaterThan:
-            re = makeRegex("^>");
-            break;
-        case greaterThanEqual:
-            re = makeRegex("^>=");
-            break;
-        case equalsEquals:
-            re = makeRegex("^==");
-            break;
-        case notEquals:
-            re = makeRegex("^!=");
-            break;
-        case andOp:
-            re = makeRegex("^&&");
-            break;
-        case orOp:
-            re = makeRegex("^\\|\\|");
-            break;
-        case notOp:
-            re = makeRegex("^!");
-            break;
-
-        // Special Terminal Types
-        case endOfFile:
-            // re = makeRegex("^$");
-            if (strlen(text) == 0)
-                return 1;
-            else
-                return 0;
-            break;
-        default:
+    if (terminal == endOfFile) {
+        if (strlen(text) == 0)
+            return 1;
+        else
             return 0;
     }
+
+    if (terminal == lexicalError) return 0;
+
+    re = this->regex_array[terminal];
 
     if (re == NULL) {
         cerr << "Failed to make regular expression" << endl;
@@ -331,3 +202,170 @@ Token *Scanner::makeTokenList(const char *text) {
  * Tokens; otherwise NULL
  */
 Token *Scanner::scan(const char *text) { return makeTokenList(text); }
+
+/**
+ * initialize the regex_array, this function will be called
+ * in the constructor of Scanner
+ */
+void Scanner::initializeRegex() {
+    this->regex_array = new regex_t *[lexicalError];
+    regex_t *re = NULL;
+
+    for (int tokenTypeIndex = 0; tokenTypeIndex != lexicalError;
+         tokenTypeIndex++) {
+        tokenType currentType = static_cast<tokenType>(tokenTypeIndex);
+
+        switch (currentType) {
+            // keywords
+            case intKwd:
+                re = makeRegex("^int");
+                break;
+            case floatKwd:
+                re = makeRegex("^float");
+                break;
+            case boolKwd:
+                re = makeRegex("^boolean");
+                break;
+            case trueKwd:
+                re = makeRegex("^true");
+                break;
+            case falseKwd:
+                re = makeRegex("^false");
+                break;
+            case stringKwd:
+                re = makeRegex("^string");
+                break;
+            case matrixKwd:
+                re = makeRegex("^matrix");
+                break;
+            case letKwd:
+                re = makeRegex("^let");
+                break;
+            case inKwd:
+                re = makeRegex("^in");
+                break;
+            case endKwd:
+                re = makeRegex("^end");
+                break;
+            case ifKwd:
+                re = makeRegex("^if");
+                break;
+            case thenKwd:
+                re = makeRegex("^then");
+                break;
+            case elseKwd:
+                re = makeRegex("^else");
+                break;
+            case repeatKwd:
+                re = makeRegex("^repeat");
+                break;
+            case whileKwd:
+                re = makeRegex("^while");
+                break;
+            case printKwd:
+                re = makeRegex("^print");
+                break;
+            case toKwd:
+                re = makeRegex("^to");
+                break;
+
+            // constants
+            case intConst:
+                re = makeRegex("^[0-9]+");
+                break;
+            case floatConst:
+                re = makeRegex("^[0-9]+\\.[0-9]+");
+                break;
+            case stringConst:
+                re = makeRegex("^\"[^\"]*\"");
+                break;
+
+            // Names
+            case variableName:
+                re = makeRegex("^[_a-zA-Z]+[_a-zA-Z0-9]*");
+                break;
+
+            // Punctuation
+            case leftParen:
+                re = makeRegex("^\\(");
+                break;
+            case rightParen:
+                re = makeRegex("^\\)");
+                break;
+            case leftCurly:
+                re = makeRegex("^\\{");
+                break;
+            case rightCurly:
+                re = makeRegex("^\\}");
+                break;
+            case leftSquare:
+                re = makeRegex("^\\[");
+                break;
+            case rightSquare:
+                re = makeRegex("^\\]");
+                break;
+            case semiColon:
+                re = makeRegex("^;");
+                break;
+            case colon:
+                re = makeRegex("^:");
+                break;
+
+            // Operators
+            case assign:
+                re = makeRegex("^\\=");
+                break;
+            case plusSign:
+                re = makeRegex("^\\+");
+                break;
+            case star:
+                re = makeRegex("^\\*");
+                break;
+            case dash:
+                re = makeRegex("^\\-");
+                break;
+            case forwardSlash:
+                re = makeRegex("^/");
+                break;
+            case lessThan:
+                re = makeRegex("^<");
+                break;
+            case lessThanEqual:
+                re = makeRegex("^<=");
+                break;
+            case greaterThan:
+                re = makeRegex("^>");
+                break;
+            case greaterThanEqual:
+                re = makeRegex("^>=");
+                break;
+            case equalsEquals:
+                re = makeRegex("^==");
+                break;
+            case notEquals:
+                re = makeRegex("^!=");
+                break;
+            case andOp:
+                re = makeRegex("^&&");
+                break;
+            case orOp:
+                re = makeRegex("^\\|\\|");
+                break;
+            case notOp:
+                re = makeRegex("^!");
+                break;
+
+            // Special Terminal Types
+            case endOfFile:
+                re = makeRegex("^$");
+                break;
+
+            default:
+                re = NULL;
+                break;
+        }
+        regex_array[tokenTypeIndex] = re;
+    }
+
+    return;
+}
