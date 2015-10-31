@@ -34,6 +34,13 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
     regex_t *re = NULL;
     int numMatchedChars = 0;
 
+    /**
+     * handle endOfFile in a different way. When we are matching
+     * the endOfFile, if the string length is 0, then let the length
+     * of matched string be 1, rather than 0. In this way we
+     * can correctly detect the endOfFile (length given by other
+     * tokenTypes will be 0 and endOfFile gives 1).
+     */
     if (terminal == endOfFile) {
         if (strlen(text) == 0)
             return 1;
@@ -43,6 +50,7 @@ int Scanner::matchTokenType(const char *text, tokenType terminal) {
 
     if (terminal == lexicalError) return 0;
 
+    // extract regular expression from the private member regex_array
     re = this->regex_array[terminal];
 
     if (re == NULL) {
@@ -121,7 +129,7 @@ int Scanner::matchToken(const char *text, Token *&matchedToken) {
     int maxNumMatchedChars = -1;
     tokenType matchedType = lexicalError;
 
-    for (int tokenTypeIndex = 0; tokenTypeIndex < lexicalError;
+    for (int tokenTypeIndex = 0; tokenTypeIndex != lexicalError;
          tokenTypeIndex++) {
         tokenType currentType = static_cast<tokenType>(tokenTypeIndex);
         int numMatchedChars = matchTokenType(text, currentType);
@@ -209,6 +217,8 @@ Token *Scanner::scan(const char *text) { return makeTokenList(text); }
  */
 void Scanner::initializeRegex() {
     this->regex_array = new regex_t *[lexicalError];
+
+    // a temporary pointer re
     regex_t *re = NULL;
 
     for (int tokenTypeIndex = 0; tokenTypeIndex != lexicalError;
