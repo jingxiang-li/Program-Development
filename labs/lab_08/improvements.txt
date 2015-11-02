@@ -31,7 +31,7 @@ Question 5:
 No we did not create a named regex_t pointer for each regex instead of only putting them in an array. No the expressions are not necessary and we can get rid of these. We created an array called "regex_array" that holds all the pointers to each regular expression for each token type.
 
 Question 6:
-No there are no places in which enumerated tokenTYpe values should be used instead of integer literals.
+No there are no places in which enumerated tokenType values should be used instead of integer literals.
 
 
 
