@@ -24,6 +24,110 @@ public:
     virtual ~Stmts() {}
 };
 
+//VarNameProgram
+class VarnameProgram : public Program {
+private:
+	string varName;
+	string Stmts;
+public:
+	VarnameStmts(string_varName) {varName = _varName; }
+    string unparse() { return varName; }
+};
+
+//empty
+class empty : public Stmts {
+private:
+	string "";
+public empty(string _"") { varName = _""; }
+    string unparse() { return ""; }
+};
+
+//Stmts
+class StmtStmts : public Stmts {
+private:
+	string stmt;
+	string* stmts;
+public:  
+	StmtStmts(string _Stmt, string _Stmts) { stmt = _Stmt; stmts = _Stmts}
+    string unparse() { return Stmt + stmts.unparse(); }
+};
+
+//DeclStmt
+class DeclStmt : public Stmt {
+private:
+    string Decl;
+
+public:
+    DeclStmt(string _Decl) { varName = _Decl; }
+    string unparse() { return Decl; }
+};
+
+// NestedStmt
+class NestedStmt : public Stmt {
+    Stmt s1;
+
+public:
+    NestedExpr(Stmt _s1) { s1 = _s1; }
+    string unparse() { return "{ " + s1.unparse() + " }"; }
+};
+
+// IfExprStmt
+class IfExprStmt : public Stmt {
+private:
+   	Expr ex1;
+   	Stmt st1;
+
+public:
+	IfExprStmt(ex, st) { ex1 = ex; st1 = st; }
+	string unparse() {
+}
+};
+
+// IfElseStmt
+class IfElseStmt : public Stmt {
+private:
+   	Expr ex1;
+   	Stmt st1;
+   	Stmt st2;
+
+public:
+	IfExprStmt(ex, st) { ex1 = ex; st1 = st; }
+	string unparse() {
+}
+};
+
+//varNameStmt
+
+//printStmt
+
+//repeatStmt
+
+//whileStmt
+
+//semicolonStmt
+
+// Decl abstract class
+class Decl : public Node {
+public:
+    virtual string unparse() { return string("this is pure virtual"); }
+    virtual string cppCode() { return string("this is pure virtual"); };
+    virtual ~Decl() {}
+};
+
+// IntVarNameDecl
+
+// FloatVarNameDecl
+
+// StringVarNameDecl
+
+// BooleanVarNameDecl
+
+// MatrixNestedExprDecl
+
+// MatrixEqualsExprDecl
+
+// MatrixVarname
+
 // Expr, abstract class
 class Expr : public Node {
 public:
