@@ -114,19 +114,60 @@ public:
     virtual ~Decl() {}
 };
 
-// IntVarNameDecl
+// IntDecl
+class IntDecl : public Decl {
+	string varName;
+    
+public:
+    IntDecl(string _varName) { varName = _varName; }
+    string unparse() { return "int " + varName + " ;"; }
+};
 
-// FloatVarNameDecl
+// FloatDecl
+class FLoatDecl : public Decl {
+	string varName;
+    
+public:
+    FLoatDecl(string _varName) { varName = _varName; }
+    string unparse() { return "float " + varName + " ;";}
+};
 
-// StringVarNameDecl
+// StringDecl
+class StringDecl : public Decl {
+	string varName;
+    
+public:
+    StringDecl(string _varName) { varName = _varName; }
+    string unparse() { return "string " + varName + " ;";}
+};
 
-// BooleanVarNameDecl
+// BooleanDecl
+class BooleanDecl : public Decl {
+	string varName;
+    
+public:
+    BooleanDecl(string _varName) { varName = _varName; }
+    string unparse() { return "boolean " + varName + " ;";}
+};
 
-// MatrixNestedExprDecl
-
-// MatrixEqualsExprDecl
-
-// MatrixVarname
+// MatrixNestedDecl
+class MatrixNestedDecl : public Decl {
+	string varName1;
+	string varName2;
+	string varName3;
+    
+public:
+    MatrixNestedDecl(string _varName) { varName = _varName; }
+    string unparse() { return "matrix " + varName1 + "[ " + Expr + ": "+ Expr + "] " + varName2 ": " + varName3 + "= " Expr + "; ";}
+};
+// MatrixVarNameDecl
+class MatrixNestedDecl : public Decl {
+	string varName;
+	    
+public:
+    MatrixNestedDecl(string _varName) { varName = _varName; }
+    string unparse() { return "matrix " + varName "= " Expr "; ";}
+};
 
 // Expr, abstract class
 class Expr : public Node {
