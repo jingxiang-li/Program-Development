@@ -8,7 +8,7 @@
 
 using namespace std;
 
-// Node, abstract class
+// Node, super class, abstract, interface
 class Node {
 public:
     virtual string unparse() = 0;
@@ -16,7 +16,9 @@ public:
     virtual ~Node() {}
 };
 
-// Stmtsm abstract class
+//===================================================================
+
+// Stmts, abstract class, inherits from Node
 class Stmts : public Node {
 public:
     virtual string unparse() { return string("this is pure virtual"); }
@@ -24,94 +26,222 @@ public:
     virtual ~Stmts() {}
 };
 
-//VarNameProgram
-class VarnameProgram : public Program {
-private:
-	string varName;
-	string Stmts;
+// Stmt, abstract class, inherits from Node
+class Stmt : public Node {
 public:
-	VarnameStmts(string_varName) {varName = _varName; }
-    string unparse() { return varName; }
+    virtual string unparse() { return string("this is pure virtual"); }
+    virtual string cppCode() { return string("this is pure virtual"); }
+    virtual ~Stmt() {}
 };
 
-//empty
-class empty : public Stmts {
-private:
-	string "";
-public empty(string _"") { varName = _""; }
-    string unparse() { return ""; }
-};
-
-//Stmts
-class StmtStmts : public Stmts {
-private:
-	string stmt;
-	string* stmts;
-public:  
-	StmtStmts(string _Stmt, string _Stmts) { stmt = _Stmt; stmts = _Stmts}
-    string unparse() { return Stmt + stmts.unparse(); }
-};
-
-//DeclStmt
-class DeclStmt : public Stmt {
-private:
-    string Decl;
-
-public:
-    DeclStmt(string _Decl) { varName = _Decl; }
-    string unparse() { return Decl; }
-};
-
-// NestedStmt
-class NestedStmt : public Stmt {
-    Stmt s1;
-
-public:
-    NestedExpr(Stmt _s1) { s1 = _s1; }
-    string unparse() { return "{ " + s1.unparse() + " }"; }
-};
-
-// IfExprStmt
-class IfExprStmt : public Stmt {
-private:
-   	Expr ex1;
-   	Stmt st1;
-
-public:
-	IfExprStmt(ex, st) { ex1 = ex; st1 = st; }
-	string unparse() {
-}
-};
-
-// IfElseStmt
-class IfElseStmt : public Stmt {
-private:
-   	Expr ex1;
-   	Stmt st1;
-   	Stmt st2;
-
-public:
-	IfExprStmt(ex, st) { ex1 = ex; st1 = st; }
-	string unparse() {
-}
-};
-
-//varNameStmt
-
-//printStmt
-
-//repeatStmt
-
-//whileStmt
-
-//semicolonStmt
-
-// Decl abstract class
+// Decl, abstract class, inherits from Node
 class Decl : public Node {
 public:
     virtual string unparse() { return string("this is pure virtual"); }
-    virtual string cppCode() { return string("this is pure virtual"); };
+    virtual string cppCode() { return string("this is pure virtual"); }
     virtual ~Decl() {}
+};
+
+// Expr, abstract class, inherits from Node
+class Expr : public Node {
+public:
+    virtual string unparse() { return string("this is pure virtual"); }
+    virtual string cppCode() { return string("this is pure virtual"); }
+    virtual ~Expr() {}
+};
+
+// Program, inherits from Node
+// Program ::= varName '(' ')' '{' Stmts '}'  //root
+class Program : public Node {
+private:
+    string varName;
+    Stmts stmts;
+
+public:
+    Program(string _varName, Stmts _stmts) {
+        varName = _varName;
+        stmts = _stmts;
+    }
+    string unparse() { return varName + " ( ) { " + stmts.unparse() + " }"; }
+    string cppCode() { return varName + " ( ) { " + stmts.cppCode() + " }"; }
+};
+
+//=========================================================
+/**
+ * Concrete classes for Stmts
+ */
+
+// EmptyStmts, inherits from Stmts
+// Stmts ::= <<empty>>
+class EmptyStmts : public Stmts {
+public:
+    EmptyStmts() {}
+    string unparse() { return ""; }
+};
+
+// SeqStmts, inherits from Stmts
+// Stmts ::= Stmt Stmts
+class SeqStmts : public Stmts {
+private:
+    Stmt stmt;
+    Stmts stmts;
+
+public:
+    SeqStmts(Stmt _stmt, Stmts _stmts) {
+        stmt = _stmt;
+        stmts = _stmts;
+    }
+    string unparse() { return stmt.unparse() + "\n" + stmts.unparse(); }
+};
+
+//========================================================
+/**
+ * Concrete classes for Stmt
+ */
+
+// DeclStmt, inherits from Stmt
+// Stmt ::= Decl
+class DeclStmt : public Stmt {
+private:
+    Decl decl;
+
+public:
+    DeclStmt(Decl _decl) { decl = _decl; }
+    string unparse() { return decl.unparse(); }
+};
+
+// NestedStmt, inherits from Stmt
+class NestedStmt : public Stmt {
+private:
+    Stmt s1;
+
+public:
+    NestedStmt(Stmt _s1) { s1 = _s1; }
+    string unparse() { return "{ " + s1.unparse() + " }"; }
+};
+
+// IfExprStmt, inherits from Stmt
+class IfExprStmt : public Stmt {
+private:
+    Expr ex1;
+    Stmt st1;
+
+public:
+    IfExprStmt(Expr ex, Stmt st) {
+        ex1 = ex;
+        st1 = st;
+    }
+    string unparse() { return "if ( " + ex1.unparse() + " ) " + st1.unparse(); }
+};
+
+// IfElseStmt, inherits from Stmt
+class IfElseStmt : public Stmt {
+private:
+    Expr ex1;
+    Stmt st1;
+    Stmt st2;
+
+public:
+    IfElseStmt(Expr _ex1, Stmt _st1, Stmt _st2) {
+        ex1 = _ex1;
+        st1 = _st1;
+        st2 = _st2;
+    }
+    string unparse() {
+        return "if ( " + ex1.unparse() + " ) " + st1.unparse() + " else " +
+               st2.unparse();
+    }
+};
+
+// AssignStmt, inherits from Stmt
+class AssignStmt : public Stmt {
+private:
+    string varName;
+    Expr ex;
+
+public:
+    AssignStmt(string _varName, Expr _ex) {
+        varName = _varName;
+        ex = _ex;
+    }
+    string unparse() { return varName + "=" + ex.unparse() + ";\n"; }
+};
+
+// RangeAssginStmt, inherits from Stmt
+// varName '[' Expr ':' Expr ']' '=' Expr ';'
+class RangeAssignStmt : public Stmt {
+private:
+    string varName;
+    Expr ex1, ex2, ex3;
+
+public:
+    RangeAssignStmt(string _varName, Expr _ex1, Expr _ex2, Expr _ex3) {
+        varName = _varName;
+        ex1 = _ex1;
+        ex2 = _ex2;
+        ex3 = _ex3;
+    }
+    string unparse() {
+        return varName + "[ " + ex1.unparse() + " : " + ex2.unparse() +
+               " ] = " + ex3.unparse() + ";\n";
+    }
+};
+
+// PrintStmt, inherits from Stmt
+// Stmt ::= 'print' '(' Expr ')' ';'
+class PrintStmt : public Stmt {
+private:
+    Expr ex;
+
+public:
+    PrintStmt(Expr _ex) { ex = _ex; }
+    string unparse() { return "print ( " + ex.unparse() + " );\n"; }
+};
+
+// RepeatStmt, inherits from Stmt
+// Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
+class RepeatStmt : public Stmt {
+private:
+    string varName;
+    Expr ex1, ex2;
+    Stmt st;
+
+public:
+    RepeatStmt(string _varName, Expr _ex1, Expr _ex2, Stmt _st) {
+        varName = _varName;
+        ex1 = _ex1;
+        ex2 = _ex2;
+        st = _st;
+    }
+    string unparse() {
+        return "repeat ( " + varName + " = " + ex1.unparse() + " to " +
+               ex2.unparse() + " ) " + st.unparse();
+    }
+};
+
+// WhileStmt, inherits from Stmt
+// Stmt ::= 'while' '(' Expr ')' Stmt
+class WhileStmt : public Stmt {
+private:
+    Expr ex;
+    Stmt st;
+
+public:
+    WhileStmt(Expr _ex, Stmt _st) {
+        ex = _ex;
+        st = _st;
+    }
+    string unparse() {
+        return "while ( " + ex.unparse() + " ) " + st.unparse();
+    }
+};
+
+// SemicolonStmt, inherits from Stmt
+// Stmt ::= ';'
+class SemicolonStmt : public Stmt {
+public:
+    SemicolonStmt() {}
+    string unparse() { return ";\n"; }
 };
 
 // IntVarNameDecl
@@ -127,14 +257,6 @@ public:
 // MatrixEqualsExprDecl
 
 // MatrixVarname
-
-// Expr, abstract class
-class Expr : public Node {
-public:
-    virtual string unparse() { return string("this is pure virtual"); }
-    virtual string cppCode() { return string("this is pure virtual"); };
-    virtual ~Expr() {}
-};
 
 // VarNameExpr
 class VarNameExpr : public Expr {
