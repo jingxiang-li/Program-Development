@@ -101,6 +101,11 @@ public:
     Scanner();
 
     /**
+     * Deconstructor of Scanner, delete the token list and regex_array
+     */
+    ~Scanner();
+
+    /**
      * scan the input text and return a list of Tokens parsed from the text
      * @param  text input string
      * @return      On success, a pointer pointing to the head of the list of
