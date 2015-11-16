@@ -390,7 +390,8 @@ ParseResult Parser::parseVariableName() {
     else if (attemptMatch(leftParen)) {
         ParseResult result1 = parseExpr(0);
         match(rightParen);
-        pr.ast = new NestedOrFunctionCallExpr(varName, dynamic_cast<Expr *>(result1.ast));
+        pr.ast = new NestedOrFunctionCallExpr(
+            varName, dynamic_cast<Expr *>(result1.ast));
         pr.ok = true;
     }
     // Expr := variableName
@@ -460,7 +461,10 @@ ParseResult Parser::parseAddition(ParseResult prLeft) {
     // parser has already matched left expression
     ParseResult pr;
     match(plusSign);
-    parseExpr(prevToken->lbp());
+    ParseResult result1 = parseExpr(prevToken->lbp());
+    pr.ast = new AddExpr(dynamic_cast<Expr *>(prLeft.ast),
+                         dynamic_cast<Expr *>(result1.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -469,7 +473,10 @@ ParseResult Parser::parseMultiplication(ParseResult prLeft) {
     // parser has already matched left expression
     ParseResult pr;
     match(star);
-    parseExpr(prevToken->lbp());
+    ParseResult result1 = parseExpr(prevToken->lbp());
+    pr.ast = new MultiplyExpr(dynamic_cast<Expr *>(prLeft.ast),
+                              dynamic_cast<Expr *>(result1.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -478,7 +485,10 @@ ParseResult Parser::parseSubtraction(ParseResult prLeft) {
     // parser has already matched left expression
     ParseResult pr;
     match(dash);
-    parseExpr(prevToken->lbp());
+    ParseResult result1 = parseExpr(prevToken->lbp());
+    pr.ast = new SubtractExpr(dynamic_cast<Expr *>(prLeft.ast),
+                              dynamic_cast<Expr *>(result1.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -487,7 +497,10 @@ ParseResult Parser::parseDivision(ParseResult prLeft) {
     // parser has already matched left expression
     ParseResult pr;
     match(forwardSlash);
-    parseExpr(prevToken->lbp());
+    ParseResult result1 = parseExpr(prevToken->lbp());
+    pr.ast = new DevideExpr(dynamic_cast<Expr *>(prLeft.ast),
+                            dynamic_cast<Expr *>(result1.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -508,13 +521,37 @@ ParseResult Parser::parseDivision(ParseResult prLeft) {
 ParseResult Parser::parseRelationalExpr(ParseResult prLeft) {
     // parser has already matched left expression
     ParseResult pr;
-
+    Expr *ex = NULL;
     nextToken();
     // just advance token, since examining it in parseExpr caused
     // this method being called.
     string op = prevToken->lexeme;
 
-    parseExpr(prevToken->lbp());
+    ParseResult result1 = parseExpr(prevToken->lbp());
+    if ("==" == op)
+        ex = new EqualEqualExpr(dynamic_cast<Expr *>(prLeft.ast),
+                                dynamic_cast<Expr *>(result1.ast));
+    else if ("<=" == op)
+        ex = new LessEqualExpr(dynamic_cast<Expr *>(prLeft.ast),
+                               dynamic_cast<Expr *>(result1.ast));
+    else if (">=" == op)
+        ex = new GreaterEqualExpr(dynamic_cast<Expr *>(prLeft.ast),
+                                  dynamic_cast<Expr *>(result1.ast));
+    else if ("!=" == op)
+        ex = new NotEqualExpr(dynamic_cast<Expr *>(prLeft.ast),
+                              dynamic_cast<Expr *>(result1.ast));
+    else if ("<" == op)
+        ex = new LessExpr(dynamic_cast<Expr *>(prLeft.ast),
+                          dynamic_cast<Expr *>(result1.ast));
+    else if (">" == op)
+        ex = new GreaterExpr(dynamic_cast<Expr *>(prLeft.ast),
+                             dynamic_cast<Expr *>(result1.ast));
+
+    if (NULL == ex)
+        throw((string) "Bad Syntax of Relational Expr in parseRelationalExpr");
+
+    pr.ast = ex;
+    pr.ok = true;
     return pr;
 }
 
