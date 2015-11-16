@@ -1,4 +1,12 @@
-/* A small meaningless comment */
+/**
+ * Scanner: a class contains method to parse from CDAL language text file
+ * to a list of Tokens
+ *
+ * Author: Jingxiang Li, Tanoja Sunkam
+ *
+ * Last modified: Sun 15 Nov 2015 10:12:56 PM CST
+ */
+
 #ifndef SCANNER_H
 #define SCANNER_H
 
@@ -93,7 +101,6 @@ public:
  */
 class Scanner {
 public:
-
     /**
      * Constructor for Scanner, initialize head, tail and regex_array
      * by calling initializeRegex()
