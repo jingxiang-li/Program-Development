@@ -1,12 +1,26 @@
+/**
+ * AST: a tree representation of the abstract syntactic structure of source
+ * code written in a programming language
+ *
+ * Node: a node in the AST tree parsed from the CDAL language text file.
+ * it contains methods to unparse the node and translate it to cpp code.
+ *
+ * Author: Jingxiang Li, Tanoja Sunkam
+ *
+ * Last modified: Sun 15 Nov 2015 10:09:54 PM CST
+ */
+
 #ifndef Node_H
 #define Node_H
 
-#include <string>
+#include "./scanner.h"
 #include <iostream>
-
-#include "scanner.h"
+#include <string>
 
 using namespace std;
+
+//===================================================================
+// Node
 
 // Node, super class, abstract, interface
 class Node {
@@ -16,7 +30,9 @@ public:
     virtual ~Node() {}
 };
 
+
 //===================================================================
+// Subclasses of Node
 
 // Stmts, abstract class, inherits from Node
 class Stmts : public Node {
@@ -50,152 +66,128 @@ public:
     virtual ~Expr() {}
 };
 
-// Program, inherits from Node
-// Program ::= varName '(' ')' '{' Stmts '}'  //root
+// Program, concrete class, inherits from Node
+// Program ::= varName '(' ')' '{' Stmts '}'
 class Program : public Node {
 private:
     string varName;
-    Stmts stmts;
+    Stmts *stmts;
 
 public:
-    Program(string _varName, Stmts _stmts) {
-        varName = _varName;
-        stmts = _stmts;
-    }
-    string unparse() { return varName + " ( ) { " + stmts.unparse() + " }"; }
-    string cppCode() { return varName + " ( ) { " + stmts.cppCode() + " }"; }
+    Program(string _varName, Stmts *_stmts);
+    string unparse();
+    string cppCode();
 };
 
+
 //=========================================================
-/**
- * Concrete classes for Stmts
- */
+// Subclasses of Stmts
 
 // EmptyStmts, inherits from Stmts
 // Stmts ::= <<empty>>
 class EmptyStmts : public Stmts {
 public:
-    EmptyStmts() {}
-    string unparse() { return ""; }
+    EmptyStmts();
+    string unparse();
+    string cppCode();
 };
 
 // SeqStmts, inherits from Stmts
 // Stmts ::= Stmt Stmts
 class SeqStmts : public Stmts {
 private:
-    Stmt stmt;
-    Stmts stmts;
+    Stmt *st1;
+    Stmts *stmts;
 
 public:
-    SeqStmts(Stmt _stmt, Stmts _stmts) {
-        stmt = _stmt;
-        stmts = _stmts;
-    }
-    string unparse() { return stmt.unparse() + "\n" + stmts.unparse(); }
+    SeqStmts(Stmt *_st1, Stmts *_stmts);
+    string unparse();
 };
 
+
 //========================================================
-/**
- * Concrete classes for Stmt
- */
+// Subclasses of Stmt
 
 // DeclStmt, inherits from Stmt
 // Stmt ::= Decl
 class DeclStmt : public Stmt {
 private:
-    Decl decl;
+    Decl *decl;
 
 public:
-    DeclStmt(Decl _decl) { decl = _decl; }
-    string unparse() { return decl.unparse(); }
+    DeclStmt(Decl *_decl);
+    string unparse();
 };
 
 // NestedStmt, inherits from Stmt
+// Stmt ::= '{' Stmts '}'
 class NestedStmt : public Stmt {
 private:
-    Stmt s1;
+    Stmt *st1;
 
 public:
-    NestedStmt(Stmt _s1) { s1 = _s1; }
-    string unparse() { return "{ " + s1.unparse() + " }"; }
+    NestedStmt(Stmt *_st1);
+    string unparse();
 };
 
-// IfExprStmt, inherits from Stmt
-class IfExprStmt : public Stmt {
+// IfStmt, inherits from Stmt
+// Stmt ::= 'if' '(' Expr ')' Stmt
+class IfStmt : public Stmt {
 private:
-    Expr ex1;
-    Stmt st1;
+    Expr *ex1;
+    Stmt *st1;
 
 public:
-    IfExprStmt(Expr ex, Stmt st) {
-        ex1 = ex;
-        st1 = st;
-    }
-    string unparse() { return "if ( " + ex1.unparse() + " ) " + st1.unparse(); }
+    IfStmt(Expr *_ex1, Stmt *_st1);
+    string unparse();
 };
 
 // IfElseStmt, inherits from Stmt
+// Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
 class IfElseStmt : public Stmt {
 private:
-    Expr ex1;
-    Stmt st1;
-    Stmt st2;
+    Expr *ex1;
+    Stmt *st1;
+    Stmt *st2;
 
 public:
-    IfElseStmt(Expr _ex1, Stmt _st1, Stmt _st2) {
-        ex1 = _ex1;
-        st1 = _st1;
-        st2 = _st2;
-    }
-    string unparse() {
-        return "if ( " + ex1.unparse() + " ) " + st1.unparse() + " else " +
-               st2.unparse();
-    }
+    IfElseStmt(Expr *_ex1, Stmt *_st1, Stmt *_st2);
+    string unparse();
 };
 
 // AssignStmt, inherits from Stmt
+// Stmt ::= varName '=' Expr ';'
 class AssignStmt : public Stmt {
 private:
     string varName;
-    Expr ex;
+    Expr *ex1;
 
 public:
-    AssignStmt(string _varName, Expr _ex) {
-        varName = _varName;
-        ex = _ex;
-    }
-    string unparse() { return varName + "=" + ex.unparse() + ";\n"; }
+    AssignStmt(string _varName, Expr *_ex1);
+    string unparse();
 };
 
 // RangeAssginStmt, inherits from Stmt
-// varName '[' Expr ':' Expr ']' '=' Expr ';'
+// Stmt ::= varName '[' Expr ':' Expr ']' '=' Expr ';'
 class RangeAssignStmt : public Stmt {
 private:
     string varName;
-    Expr ex1, ex2, ex3;
+    Expr *ex1, *ex2, *ex3;
 
 public:
-    RangeAssignStmt(string _varName, Expr _ex1, Expr _ex2, Expr _ex3) {
-        varName = _varName;
-        ex1 = _ex1;
-        ex2 = _ex2;
-        ex3 = _ex3;
-    }
-    string unparse() {
-        return varName + "[ " + ex1.unparse() + " : " + ex2.unparse() +
-               " ] = " + ex3.unparse() + ";\n";
-    }
+    RangeAssignStmt(string _varName, Expr *_ex1, Expr *_ex2, Expr *_ex3);
+    string unparse();
 };
 
 // PrintStmt, inherits from Stmt
 // Stmt ::= 'print' '(' Expr ')' ';'
 class PrintStmt : public Stmt {
 private:
-    Expr ex;
+    Expr *ex1;
 
 public:
-    PrintStmt(Expr _ex) { ex = _ex; }
-    string unparse() { return "print ( " + ex.unparse() + " );\n"; }
+    PrintStmt(Expr *_ex1);
+    string unparse();
 };
 
 // RepeatStmt, inherits from Stmt
@@ -203,397 +195,344 @@ public:
 class RepeatStmt : public Stmt {
 private:
     string varName;
-    Expr ex1, ex2;
-    Stmt st;
+    Expr *ex1, *ex2;
+    Stmt *st1;
 
 public:
-    RepeatStmt(string _varName, Expr _ex1, Expr _ex2, Stmt _st) {
-        varName = _varName;
-        ex1 = _ex1;
-        ex2 = _ex2;
-        st = _st;
-    }
-    string unparse() {
-        return "repeat ( " + varName + " = " + ex1.unparse() + " to " +
-               ex2.unparse() + " ) " + st.unparse();
-    }
+    RepeatStmt(string _varName, Expr *_ex1, Expr *_ex2, Stmt *_st1);
+    string unparse();
 };
 
 // WhileStmt, inherits from Stmt
 // Stmt ::= 'while' '(' Expr ')' Stmt
 class WhileStmt : public Stmt {
 private:
-    Expr ex;
-    Stmt st;
+    Expr *ex1;
+    Stmt *st1;
 
 public:
-    WhileStmt(Expr _ex, Stmt _st) {
-        ex = _ex;
-        st = _st;
-    }
-    string unparse() {
-        return "while ( " + ex.unparse() + " ) " + st.unparse();
-    }
+    WhileStmt(Expr *_ex1, Stmt *_st1);
+    string unparse();
 };
 
 // SemicolonStmt, inherits from Stmt
 // Stmt ::= ';'
 class SemicolonStmt : public Stmt {
 public:
-    SemicolonStmt() {}
-    string unparse() { return ";\n"; }
+    SemicolonStmt();
+    string unparse();
 };
 
-//===================================================================
+
+//========================================================
+// Subclasses of Decl
 
 // IntDecl
+// Decl ::= 'int' varName ';'
 class IntDecl : public Decl {
     string varName;
 
 public:
-    IntDecl(string _varName) { varName = _varName; }
-    string unparse() { return "int " + varName + " ;"; }
+    IntDecl(string _varName);
+    string unparse();
 };
 
 // FloatDecl
-class FLoatDecl : public Decl {
+// Decl ::= 'float' varName ';'
+class FloatDecl : public Decl {
     string varName;
 
 public:
-    FLoatDecl(string _varName) { varName = _varName; }
-    string unparse() { return "float " + varName + " ;"; }
+    FloatDecl(string _varName);
+    string unparse();
 };
 
 // StringDecl
+// Decl ::= 'string' varName ';'
 class StringDecl : public Decl {
     string varName;
 
 public:
-    StringDecl(string _varName) { varName = _varName; }
-    string unparse() { return "string " + varName + " ;"; }
+    StringDecl(string _varName);
+    string unparse();
 };
 
 // BooleanDecl
+// Decl ::= 'boolean' varName ';'
 class BooleanDecl : public Decl {
     string varName;
 
 public:
-    BooleanDecl(string _varName) { varName = _varName; }
-    string unparse() { return "boolean " + varName + " ;"; }
+    BooleanDecl(string _varName);
+    string unparse();
 };
 
 // MatrixLongDecl
+// Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '=' Expr
+// ';'
 class MatrixLongDecl : public Decl {
     string varName1, varName2, varName3;
-    Expr ex1, ex2, ex3;
+    Expr *ex1, *ex2, *ex3;
 
 public:
     MatrixLongDecl(string _varName1, string _varName2, string _varName3,
-                   Expr _ex1, Expr _ex2, Expr _ex3) {
-        varName1 = _varName1;
-        varName2 = _varName2;
-        varName3 = _varName3;
-        ex1 = _ex1;
-        ex2 = _ex2;
-        ex3 = _ex3;
-    }
-    string unparse() {
-        return "matrix " + varName1 + "[ " + ex1.unparse() + " :  " +
-               ex2.unparse() + " ] " + varName2 + " : " + varName3 + " = " +
-               ex3.unparse() + ";\n";
-    }
+                   Expr *_ex1, Expr *_ex2, Expr *_ex3);
+    string unparse();
 };
 
 // MatrixShortDecl
+// Decl ::= 'matrix' varName '=' Expr ';'
 class MatrixShortDecl : public Decl {
     string varName;
-    Expr ex;
+    Expr *ex1;
 
 public:
-    MatrixShortDecl(string _varName, Expr _ex) {
-        varName = _varName;
-        ex = _ex;
-    }
-    string unparse() {
-        return "matrix " + varName + " = " + ex.unparse() + ";\n";
-    }
+    MatrixShortDecl(string _varName, Expr *_ex1);
+    string unparse();
 };
 
+
+//========================================================
+// Subclasses of Expr
+
 // VarNameExpr
+// Expr ::= varName
 class VarNameExpr : public Expr {
 private:
     string varName;
 
 public:
-    VarNameExpr(string _varName) { varName = _varName; }
-    string unparse() { return varName; }
+    VarNameExpr(string _varName);
+    string unparse();
 };
 
 // IntExpr
+// Expr ::= integerConst
 class IntExpr : public Expr {
     int val;
 
 public:
-    IntExpr(int _val) { val = _val; }
-    string unparse() { return to_string(val); }
+    IntExpr(int _val);
+    string unparse();
 };
 
 // FloatExpr
+// Expr ::= floatConst
 class FloatExpr : public Expr {
     double val;
 
 public:
-    FloatExpr(double _val) { val = _val; }
-    string unparse() { return to_string(val); }
+    FloatExpr(double _val);
+    string unparse();
 };
 
 // StringExpr
+// Expr ::= stringConst
 class StringExpr : public Expr {
     string val;
 
 public:
-    StringExpr(string _val) { val = _val; }
-    string unparse() { return val; }
+    StringExpr(string _val);
+    string unparse();
 };
 
 // TrueExpr
+// Expr ::= 'true'
 class TrueExpr : public Expr {
-    bool val;
-
 public:
-    TrueExpr(bool _val) { val = _val; }
-    string unparse() { return to_string(val); }
+    TrueExpr();
+    string unparse();
 };
 
 // FalseExpr
+// Expr ::= 'false'
 class FalseExpr : public Expr {
-    bool val;
-
 public:
-    FalseExpr(bool _val) { val = _val; }
-    string unparse() { return to_string(val); }
+    FalseExpr();
+    string unparse();
 };
 
 // MultiplyExpr
+// Expr ::= Expr '*' Expr
 class MultiplyExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    MultiplyExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " * " + e2.unparse(); }
+    MultiplyExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // DevideExpr
+// Expr ::= Expr '/' Expr
 class DevideExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    DevideExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " / " + e2.unparse(); }
+    DevideExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // AddExpr
+// Expr ::= Expr '+' Expr
 class AddExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    AddExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " + " + e2.unparse(); }
+    AddExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // SubtractExpr
+// Expr ::= Expr '-' Expr
 class SubtractExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    SubtractExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " - " + e2.unparse(); }
+    SubtractExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // GreaterExpr
+// Expr ::= Expr '>' Expr
 class GreaterExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    GreaterExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " > " + e2.unparse(); }
+    GreaterExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // GreaterEqualExpr
+// Expr ::= Expr '>=' Expr
 class GreaterEqualExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    GreaterEqualExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " >= " + e2.unparse(); }
+    GreaterEqualExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // LessExpr
+// Expr ::= Expr '<' Expr
 class LessExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    LessExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " < " + e2.unparse(); }
+    LessExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // LessEqualExpr
+// Expr ::= Expr '<=' Expr
 class LessEqualExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    LessEqualExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " <= " + e2.unparse(); }
+    LessEqualExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // EqualEqualExpr
+// Expr ::= Expr '==' Expr
 class EqualEqualExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    EqualEqualExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " == " + e2.unparse(); }
+    EqualEqualExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // NotEqualExpr
+// Expr ::= Expr '!=' Expr
 class NotEqualExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    NotEqualExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " != " + e2.unparse(); }
+    NotEqualExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // AndExpr
+// Expr ::= Expr '&&' Expr
 class AndExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    AndExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " && " + e2.unparse(); }
+    AndExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // OrExpr
+// Expr ::= Expr '||' Expr
 class OrExpr : public Expr {
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    OrExpr(Expr _e1, Expr _e2) {
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() { return e1.unparse() + " || " + e2.unparse(); }
+    OrExpr(Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // MatrixExpr
+// Expr ::= varName '[' Expr ':' Expr ']'
 class MatrixExpr : public Expr {
     string varName;
-    Expr e1, e2;
+    Expr *ex1, *ex2;
 
 public:
-    MatrixExpr(string _varName, Expr _e1, Expr _e2) {
-        varName = _varName;
-        e1 = _e1;
-        e2 = _e2;
-    }
-    string unparse() {
-        return varName + " [ " + e1.unparse() + " : " + e2.unparse() + " ]";
-    }
+    MatrixExpr(string _varName, Expr *_ex1, Expr *_ex2);
+    string unparse();
 };
 
 // NestedOrFunctionCallExpr
+// Expr ::= varName '(' Expr ')'
 class NestedOrFunctionCallExpr : public Expr {
     string varName;
-    Expr e1;
+    Expr *ex1;
 
 public:
-    NestedOrFunctionCallExpr(string _varName, Expr _e1) {
-        varName = _varName;
-        e1 = _e1;
-    }
-    string unparse() { return varName + "( " + e1.unparse() + " )"; }
+    NestedOrFunctionCallExpr(string _varName, Expr *_ex1);
+    string unparse();
 };
 
 // NestedExpr
+// Expr ::= '(' Expr ')'
 class NestedExpr : public Expr {
-    Expr e1;
+    Expr *ex1;
 
 public:
-    NestedExpr(Expr _e1) { e1 = _e1; }
-    string unparse() { return "( " + e1.unparse() + " )"; }
+    NestedExpr(Expr *_ex1);
+    string unparse();
 };
 
 // LetExpr
+// Expr ::= 'let' Stmts 'in' Expr 'end'
 class LetExpr : public Expr {
-    Stmts stmts;
-    Expr expr;
+    Stmts *stmts;
+    Expr *ex1;
 
 public:
-    LetExpr(Stmts _stmts, Expr _expr) {
-        stmts = _stmts;
-        expr = _expr;
-    }
-    string unparse() {
-        return "let " + stmts.unparse() + " in " + expr.unparse() + " end";
-    }
+    LetExpr(Stmts *_stmts, Expr *_ex1);
+    string unparse();
 };
 
 // IfExpr
+// Expr ::= 'if' Expr 'then' Expr 'else' Expr
 class IfExpr : public Expr {
-    Expr e1, e2, e3;
+    Expr *ex1, *ex2, *ex3;
 
 public:
-    IfExpr(Expr _e1, Expr _e2, Expr _e3) {
-        e1 = _e1;
-        e1 = _e2;
-        e3 = _e3;
-    }
-    string unparse() {
-        return "if " + e1.unparse() + " then " + e2.unparse() + " else " +
-               e3.unparse();
-    }
+    IfExpr(Expr *_ex1, Expr *_ex2, Expr *_ex3);
+    string unparse();
 };
 
 // NotExpr
+// Expr ::= '!' Expr
 class NotExpr : public Expr {
-    Expr expr;
+    Expr *ex1;
 
 public:
-    NotExpr(Expr _expr) { expr = _expr; }
-    string unparse() { return "! " + expr.unparse(); }
+    NotExpr(Expr *_ex1);
+    string unparse();
 };
 
-#endif
+#endif  // Node_H
