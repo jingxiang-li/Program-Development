@@ -101,8 +101,7 @@ ParseResult Parser::parseProgram() {
     ParseResult prStmts = parseStmts();
     match(rightCurly);
     match(endOfFile);
-    Program *program = new Program(varName, dynamic_cast<Stmts *>(prStmts.ast));
-    pr.ast = program;
+    pr.ast = new Program(varName, dynamic_cast<Stmts *>(prStmts.ast));
     pr.ok = true;
     return pr;
 }
@@ -208,20 +207,19 @@ ParseResult Parser::parseDecl() {
 // Stmts
 ParseResult Parser::parseStmts() {
     ParseResult pr;
-    Stmts *stmts = NULL;
     if (!nextIs(rightCurly) && !nextIs(inKwd)) {
         // Stmts ::= Stmt Stmts
         ParseResult prStmt = parseStmt();
         ParseResult prStmts = parseStmts();
-        stmts = new SeqStmts(dynamic_cast<Stmt *>(prStmt.ast),
-                             dynamic_cast<Stmts *>(prStmts.ast));
+        pr.ast = new SeqStmts(dynamic_cast<Stmt *>(prStmt.ast),
+                              dynamic_cast<Stmts *>(prStmts.ast));
+        pr.ok = true;
     } else {
         // Stmts ::=
         // nothing to match.
-        stmts = new EmptyStmts();
+        pr.ast = new EmptyStmts();
+        pr.ok = true;
     }
-    pr.ast = stmts;
-    pr.ok = true;
     return pr;
 }
 
@@ -229,13 +227,11 @@ ParseResult Parser::parseStmts() {
 // Stmt
 ParseResult Parser::parseStmt() {
     ParseResult pr;
-    Stmt *stmt;
     // Stmt ::= Decl
     if (nextIs(intKwd) || nextIs(floatKwd) || nextIs(matrixKwd) ||
         nextIs(stringKwd) || nextIs(boolKwd)) {
         ParseResult result_decl = parseDecl();
-        stmt = new DeclStmt(dynamic_cast<Decl *>(result_decl.ast));
-        pr.ast = stmt;
+        pr.ast = new DeclStmt(dynamic_cast<Decl *>(result_decl.ast));
         pr.ok = true;
     }
     // Stmt ::= '{' Stmts '}'
@@ -331,6 +327,8 @@ ParseResult Parser::parseExpr(int rbp) {
 ParseResult Parser::parseTrueKwd() {
     ParseResult pr;
     match(trueKwd);
+    pr.ast = new TrueExpr();
+    pr.ok = true;
     return pr;
 }
 
@@ -338,6 +336,8 @@ ParseResult Parser::parseTrueKwd() {
 ParseResult Parser::parseFalseKwd() {
     ParseResult pr;
     match(falseKwd);
+    pr.ast = new FalseExpr();
+    pr.ok = true;
     return pr;
 }
 
@@ -345,6 +345,9 @@ ParseResult Parser::parseFalseKwd() {
 ParseResult Parser::parseIntConst() {
     ParseResult pr;
     match(intConst);
+    int val = stoi(prevToken->lexeme);
+    pr.ast = new IntExpr(val);
+    pr.ok = true;
     return pr;
 }
 
@@ -352,6 +355,9 @@ ParseResult Parser::parseIntConst() {
 ParseResult Parser::parseFloatConst() {
     ParseResult pr;
     match(floatConst);
+    double val = stod(prevToken->lexeme);
+    pr.ast = new FloatExpr(val);
+    pr.ok = true;
     return pr;
 }
 
@@ -359,6 +365,9 @@ ParseResult Parser::parseFloatConst() {
 ParseResult Parser::parseStringConst() {
     ParseResult pr;
     match(stringConst);
+    string val = prevToken->lexeme;
+    pr.ast = new StringExpr(val);
+    pr.ok = true;
     return pr;
 }
 
@@ -366,20 +375,29 @@ ParseResult Parser::parseStringConst() {
 ParseResult Parser::parseVariableName() {
     ParseResult pr;
     match(variableName);
+    string varName(prevToken->lexeme);
+    // Expr ::= varName '[' Expr ':' Expr ']'
     if (attemptMatch(leftSquare)) {
-        parseExpr(0);
+        ParseResult result1 = parseExpr(0);
         match(colon);
-        parseExpr(0);
+        ParseResult result2 = parseExpr(0);
         match(rightSquare);
+        pr.ast = new MatrixExpr(varName, dynamic_cast<Expr *>(result1.ast),
+                                dynamic_cast<Expr *>(result2.ast));
+        pr.ok = true;
     }
     // Expr ::= varableName '(' Expr ')'        //NestedOrFunctionCall
     else if (attemptMatch(leftParen)) {
-        parseExpr(0);
+        ParseResult result1 = parseExpr(0);
         match(rightParen);
+        pr.ast = new NestedOrFunctionCallExpr(varName, dynamic_cast<Expr *>(result1.ast));
+        pr.ok = true;
     }
     // Expr := variableName
     else {
         // variable
+        pr.ast = new VarNameExpr(varName);
+        pr.ok = true;
     }
     return pr;
 }
@@ -389,8 +407,10 @@ ParseResult Parser::parseVariableName() {
 ParseResult Parser::parseNestedExpr() {
     ParseResult pr;
     match(leftParen);
-    parseExpr(0);
+    ParseResult result1 = parseExpr(0);
     match(rightParen);
+    pr.ast = new NestedExpr(dynamic_cast<Expr *>(result1.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -399,12 +419,15 @@ ParseResult Parser::parseIfExpr() {
     ParseResult pr;
 
     match(ifKwd);
-    parseExpr(0);
+    ParseResult result1 = parseExpr(0);
     match(thenKwd);
-    parseExpr(0);
+    ParseResult result2 = parseExpr(0);
     match(elseKwd);
-    parseExpr(0);
-
+    ParseResult result3 = parseExpr(0);
+    pr.ast = new IfExpr(dynamic_cast<Expr *>(result1.ast),
+                        dynamic_cast<Expr *>(result2.ast),
+                        dynamic_cast<Expr *>(result3.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -413,11 +436,13 @@ ParseResult Parser::parseIfExpr() {
 ParseResult Parser::parseLetExpr() {
     ParseResult pr;
     match(letKwd);
-    parseStmts();
+    ParseResult result1 = parseStmts();
     match(inKwd);
-    parseExpr(0);
+    ParseResult result2 = parseExpr(0);
     match(endKwd);
-
+    pr.ast = new LetExpr(dynamic_cast<Stmts *>(result1.ast),
+                         dynamic_cast<Expr *>(result2.ast));
+    pr.ok = true;
     return pr;
 }
 
@@ -425,7 +450,9 @@ ParseResult Parser::parseLetExpr() {
 ParseResult Parser::parseNotExpr() {
     ParseResult pr;
     match(notOp);
-    parseExpr(0);
+    ParseResult result1 = parseExpr(0);
+    pr.ast = new NotExpr(dynamic_cast<Expr *>(result1.ast));
+    pr.ok = true;
     return pr;
 }
 // Expr ::= Expr plusSign Expr
