@@ -110,7 +110,7 @@ public:
     /**
      * Deconstructor of Scanner, delete the token list and regex_array
      */
-    ~Scanner();
+    // ~Scanner();
 
     /**
      * scan the input text and return a list of Tokens parsed from the text
