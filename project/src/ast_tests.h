@@ -59,7 +59,7 @@ public:
                    pr2.ast != NULL);
 
         // 6. Verify that this second unparsing can be parsed.
-        string up2 = pr2.ast->unparsze();
+        string up2 = pr2.ast->unparse();
         writeFile(up2, (path + "up2").c_str());
         ParseResult pr3 = p.parse(up2.c_str());
         TSM_ASSERT(file + " failed to pares the second un-parsing.", pr3.ok);
