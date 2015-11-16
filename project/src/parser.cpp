@@ -1,9 +1,9 @@
 /* A recursive descent parser with operator precedence.
 
    Author: Eric Van Wyk
-   Modified: Robert Edge 
+   Modified: Robert Edge
    Modified: Kevin Thomsen
-   Modified: Dan Challou       
+   Modified: Dan Challou
 
    This algorithm is based on the work of Douglas Crockford in "Top
    Down Operator Precedence", a chapter in the book "Beautiful Code".
@@ -12,10 +12,10 @@
    Precedence", presented at the ACM Symposium on Principles of
    Programming Languages.
 
-   Douglas Crockford's chapter is available at 
+   Douglas Crockford's chapter is available at
     http://javascript.crockford.com/tdop/tdop.html
 
-   Vaughan Pratt's paper is available at 
+   Vaughan Pratt's paper is available at
     http://portal.acm.org/citation.cfm?id=512931
 
    These are both quite interesting works and worth reading if you
@@ -25,95 +25,99 @@
 
 */
 
-#include "parser.h"
-#include "scanner.h"
-#include "extToken.h"
+#include "./AST.h"
+#include "./parser.h"
+#include "./scanner.h"
+#include "./extToken.h"
 #include <stdio.h>
 #include <assert.h>
-using namespace std ;
+using namespace std;
 
 Parser::~Parser() {
-    if (s) delete s ;
+    if (s) delete s;
 
-    ExtToken *extTokenToDelete ;
-    currToken = tokens ;
+    ExtToken *extTokenToDelete;
+    currToken = tokens;
     while (currToken) {
-        extTokenToDelete = currToken ;
-        currToken = currToken->next ;
-        delete extTokenToDelete ;
+        extTokenToDelete = currToken;
+        currToken = currToken->next;
+        delete extTokenToDelete;
     }
 
-    Token *tokenToDelete ;
-    Token *currScannerToken = stokens ;
+    Token *tokenToDelete;
+    Token *currScannerToken = stokens;
     while (currScannerToken) {
-        tokenToDelete = currScannerToken ;
-        currScannerToken = currScannerToken->next ;
-        delete tokenToDelete ;
+        tokenToDelete = currScannerToken;
+        currScannerToken = currScannerToken->next;
+        delete tokenToDelete;
     }
-
 }
 
 
-
-Parser::Parser ( ) { 
-    currToken = NULL; prevToken = NULL ; tokens = NULL; 
-    s = NULL; stokens = NULL; 
+Parser::Parser() {
+    currToken = NULL;
+    prevToken = NULL;
+    tokens = NULL;
+    s = NULL;
+    stokens = NULL;
 }
 
-ParseResult Parser::parse (const char *text) {
-    assert (text != NULL) ;
+ParseResult Parser::parse(const char *text) {
+    assert(text != NULL);
 
-    ParseResult pr ;
+    ParseResult pr;
     try {
-        s = new Scanner() ;
-        stokens = s->scan (text) ;        
-        tokens = extendTokenList ( this, stokens ) ;
+        s = new Scanner();
+        stokens = s->scan(text);
+        tokens = extendTokenList(this, stokens);
 
-        assert (tokens != NULL) ;
-        currToken = tokens ;
-        pr = parseProgram( ) ;
+        assert(tokens != NULL);
+        currToken = tokens;
+        pr = parseProgram();
+    } catch (string errMsg) {
+        pr.ok = false;
+        pr.errors = errMsg;
+        pr.ast = NULL;
     }
-    catch (string errMsg) {
-        pr.ok = false ;
-        pr.errors = errMsg ;
-        pr.ast = NULL ;
-    }
-    return pr ;
+    return pr;
 }
 
-/* 
+/*
  * parse methods for non-terminal symbols
  * --------------------------------------
  */
 
 
 // Program
-ParseResult Parser::parseProgram () {
-    ParseResult pr ;
+ParseResult Parser::parseProgram() {
+    ParseResult pr;
     // root
-    // Program ::= varName '(' ')' '{' Stmts '}' 
-    match(variableName) ;
-    string name( prevToken->lexeme ) ;
-    match(leftParen) ;
-    match(rightParen) ;
+    // Program ::= varName '(' ')' '{' Stmts '}'
+    match(variableName);
+    string varName(prevToken->lexeme);
+    match(leftParen);
+    match(rightParen);
     match(leftCurly);
-    ParseResult prStmts = parseStmts() ;
+    ParseResult prStmts = parseStmts();
     match(rightCurly);
-    match(endOfFile) ;
-    
-    return pr ;
+    match(endOfFile);
+    Program *program = new Program(varName, dynamic_cast<Stmts *>(prStmts.ast));
+    pr.ast = program;
+    pr.ok = true;
+    return pr;
 }
 
 
 // MatrixDecl
 // identical purpose of parseDecl, handles special matrix syntax.
-ParseResult Parser::parseMatrixDecl () {
-    ParseResult pr ;
+ParseResult Parser::parseMatrixDecl() {
+    ParseResult pr;
     match(matrixKwd);
-    match(variableName) ;
+    match(variableName);
 
-    // Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '=' Expr ';'
-    if(attemptMatch(leftSquare)){
+    // Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '='
+    // Expr ';'
+    if (attemptMatch(leftSquare)) {
         parseExpr(0);
         match(colon);
         parseExpr(0);
@@ -125,163 +129,196 @@ ParseResult Parser::parseMatrixDecl () {
         parseExpr(0);
     }
     // Decl ::= 'matrix' varName '=' Expr ';'
-    else if(attemptMatch(assign)){
+    else if (attemptMatch(assign)) {
         parseExpr(0);
+    } else {
+        throw((string) "Bad Syntax of Matrix Decl in in parseMatrixDecl");
     }
-    else{
-        throw ( (string) "Bad Syntax of Matrix Decl in in parseMatrixDecl" ) ;
-    }   
 
-    match(semiColon) ;
+    match(semiColon);
 
-    return pr ;
+    return pr;
 }
-//standardDecl 
-//Decl ::= integerKwd varName | floatKwd varName | stringKwd varName
-ParseResult Parser::parseStandardDecl(){
-    ParseResult pr ;
-    
-    //ParseResult prType = parseType() ;
+// standardDecl
+// Decl ::= integerKwd varName | floatKwd varName | stringKwd varName
+ParseResult Parser::parseStandardDecl() {
+    ParseResult pr;
 
-    if ( attemptMatch(intKwd) ) {
+    enum declType { int_d, float_d, string_d, bool_d, error_d };
+
+    enum declType cur_type = error_d;
+
+    if (attemptMatch(intKwd)) {
         // Type ::= intKwd
-    } 
-    else if ( attemptMatch(floatKwd) ) {
+        cur_type = int_d;
+    } else if (attemptMatch(floatKwd)) {
         // Type ::= floatKwd
-    }
-    else if ( attemptMatch(stringKwd) ) {
+        cur_type = float_d;
+    } else if (attemptMatch(stringKwd)) {
         // Type ::= stringKwd
-    }
-    else if ( attemptMatch(boolKwd) ) {
+        cur_type = string_d;
+    } else if (attemptMatch(boolKwd)) {
         // Type ::= boolKwd
+        cur_type = bool_d;
+    } else {
+        throw((string) "Bad Syntax of Standard Decl in parseStandardDecl");
     }
-    match(variableName) ;
-    match(semiColon) ;
-    return pr ;
+
+    match(variableName);
+    string varName(prevToken->lexeme);
+    match(semiColon);
+
+    Decl *decl;
+    switch (cur_type) {
+        case int_d:
+            decl = new IntDecl(varName);
+            break;
+        case float_d:
+            decl = new FloatDecl(varName);
+            break;
+        case string_d:
+            decl = new StringDecl(varName);
+            break;
+        case bool_d:
+            decl = new BooleanDecl(varName);
+            break;
+        default:
+            throw((string) "Bad Syntax of Standard Decl in parseStandardDecl");
+    }
+    pr.ast = decl;
+    pr.ok = true;
+    return pr;
 }
 
 // Decl
-ParseResult Parser::parseDecl () {
-    ParseResult pr ;
+ParseResult Parser::parseDecl() {
+    ParseResult pr;
     // Decl :: matrix variableName ....
-    if(nextIs(matrixKwd)){
-        pr =parseMatrixDecl();
-    } 
-    // Decl ::= Type variableName semiColon
-    else{
-        pr=parseStandardDecl();
+    if (nextIs(matrixKwd)) {
+        pr = parseMatrixDecl();
     }
-    return pr ;
+    // Decl ::= Type variableName semiColon
+    else {
+        pr = parseStandardDecl();
+    }
+    return pr;
 }
 
 
-
 // Stmts
-ParseResult Parser::parseStmts () {
-    ParseResult pr ;
-    if ( ! nextIs(rightCurly) && !nextIs(inKwd)  ) {
+ParseResult Parser::parseStmts() {
+    ParseResult pr;
+    Stmts *stmts = NULL;
+    if (!nextIs(rightCurly) && !nextIs(inKwd)) {
         // Stmts ::= Stmt Stmts
-        ParseResult prStmt = parseStmt() ;
-        ParseResult prStmts = parseStmts() ;
-    }
-    else {
-        // Stmts ::= 
+        ParseResult prStmt = parseStmt();
+        ParseResult prStmts = parseStmts();
+        stmts = new SeqStmts(dynamic_cast<Stmt *>(prStmt.ast),
+                             dynamic_cast<Stmts *>(prStmts.ast));
+    } else {
+        // Stmts ::=
         // nothing to match.
+        stmts = new EmptyStmts();
     }
-    return pr ;
+    pr.ast = stmts;
+    pr.ok = true;
+    return pr;
 }
 
 
 // Stmt
-ParseResult Parser::parseStmt () {
-    ParseResult pr ;
-
-    //Stmt ::= Decl
-    if(nextIs(intKwd)||nextIs(floatKwd)||nextIs(matrixKwd)||nextIs(stringKwd)||nextIs(boolKwd)){
-        parseDecl();
+ParseResult Parser::parseStmt() {
+    ParseResult pr;
+    Stmt *stmt;
+    // Stmt ::= Decl
+    if (nextIs(intKwd) || nextIs(floatKwd) || nextIs(matrixKwd) ||
+        nextIs(stringKwd) || nextIs(boolKwd)) {
+        ParseResult result_decl = parseDecl();
+        stmt = new DeclStmt(dynamic_cast<Decl *>(result_decl.ast));
+        pr.ast = stmt;
+        pr.ok = true;
     }
-    //Stmt ::= '{' Stmts '}'
-    else if (attemptMatch(leftCurly)){
-        parseStmts() ; 
+    // Stmt ::= '{' Stmts '}'
+    else if (attemptMatch(leftCurly)) {
+        parseStmts();
         match(rightCurly);
-    }   
-    //Stmt ::= 'if' '(' Expr ')' Stmt
-    //Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
-    else if (attemptMatch(ifKwd)){
+    }
+    // Stmt ::= 'if' '(' Expr ')' Stmt
+    // Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
+    else if (attemptMatch(ifKwd)) {
         match(leftParen);
         parseExpr(0);
         match(rightParen);
         parseStmt();
-        
-        if(attemptMatch(elseKwd)){
+
+        if (attemptMatch(elseKwd)) {
             parseStmt();
         }
 
     }
-    //Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr ';'
-    else if  ( attemptMatch (variableName) ) {
-        if (attemptMatch ( leftSquare ) ) {
-              parseExpr(0);
-              match ( colon ) ;
-              parseExpr (0) ;
-              match  ( rightSquare ) ;
+    // Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr
+    // ';'
+    else if (attemptMatch(variableName)) {
+        if (attemptMatch(leftSquare)) {
+            parseExpr(0);
+            match(colon);
+            parseExpr(0);
+            match(rightSquare);
         }
         match(assign);
         parseExpr(0);
         match(semiColon);
 
     }
-    //Stmt ::= 'print' '(' Expr ')' ';'
-    else if ( attemptMatch (printKwd) ) {
-        match (leftParen) ;
+    // Stmt ::= 'print' '(' Expr ')' ';'
+    else if (attemptMatch(printKwd)) {
+        match(leftParen);
         parseExpr(0);
-        match (rightParen) ;
-        match (semiColon) ;
+        match(rightParen);
+        match(semiColon);
     }
-    //Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
-    else if ( attemptMatch (repeatKwd) ) {
-        match (leftParen) ;
-        match (variableName) ;
-        match (assign) ;
-        parseExpr (0) ;
-        match (toKwd) ;
-        parseExpr (0) ;
-        match (rightParen) ;
-        parseStmt () ;
+    // Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
+    else if (attemptMatch(repeatKwd)) {
+        match(leftParen);
+        match(variableName);
+        match(assign);
+        parseExpr(0);
+        match(toKwd);
+        parseExpr(0);
+        match(rightParen);
+        parseStmt();
     }
-    //Stmt ::= 'while' '(' Expr ')' Stmt
+    // Stmt ::= 'while' '(' Expr ')' Stmt
     else if (attemptMatch(whileKwd)) {
         match(leftParen);
         parseExpr(0);
         match(rightParen);
         parseStmt();
     }
-    //Stmt ::= ';
-    else if ( attemptMatch (semiColon) ) {
+    // Stmt ::= ';
+    else if (attemptMatch(semiColon)) {
         // parsed a skip
-    }
-    else{
-        throw ( makeErrorMsg ( currToken->terminal ) + " while parsing a statement" ) ;
+    } else {
+        throw(makeErrorMsg(currToken->terminal) + " while parsing a statement");
     }
     // Stmt ::= variableName assign Expr semiColon
-    return pr ;
+    return pr;
 }
 
 
-
 // Expr
-ParseResult Parser::parseExpr (int rbp) {
+ParseResult Parser::parseExpr(int rbp) {
     /* Examine current token, without consuming it, to call its
        associated parse methods.  The ExtToken objects have 'nud' and
        'led' methods that are dispatchers that call the appropriate
        parse methods.*/
-    ParseResult left = currToken->nud() ;
-   
-    while (rbp < currToken->lbp() ) {
-        left = currToken->led(left) ;
+    ParseResult left = currToken->nud();
+
+    while (rbp < currToken->lbp()) {
+        left = currToken->led(left);
     }
 
-    return left ;
+    return left;
 }
 
 
@@ -290,77 +327,77 @@ ParseResult Parser::parseExpr (int rbp) {
  * ----------------------------------
  */
 
- // Expr ::= trueKwd
- ParseResult Parser::parseTrueKwd ( ) {
-     ParseResult pr ;
-     match ( trueKwd ) ;
-     return pr ;
- }
+// Expr ::= trueKwd
+ParseResult Parser::parseTrueKwd() {
+    ParseResult pr;
+    match(trueKwd);
+    return pr;
+}
 
- // Expr ::= trueKwd
- ParseResult Parser::parseFalseKwd ( ) {
-     ParseResult pr ;
-     match ( falseKwd ) ;
-     return pr ;
- }
+// Expr ::= trueKwd
+ParseResult Parser::parseFalseKwd() {
+    ParseResult pr;
+    match(falseKwd);
+    return pr;
+}
 
 // Expr ::= intConst
-ParseResult Parser::parseIntConst ( ) {
-    ParseResult pr ;
-    match ( intConst ) ;
-    return pr ;
+ParseResult Parser::parseIntConst() {
+    ParseResult pr;
+    match(intConst);
+    return pr;
 }
 
 // Expr ::= floatConst
-ParseResult Parser::parseFloatConst ( ) {
-    ParseResult pr ;
-    match ( floatConst ) ;
-    return pr ;
+ParseResult Parser::parseFloatConst() {
+    ParseResult pr;
+    match(floatConst);
+    return pr;
 }
 
 // Expr ::= stringConst
-ParseResult Parser::parseStringConst ( ) {
-    ParseResult pr ;
-    match ( stringConst ) ;
-    return pr ;
+ParseResult Parser::parseStringConst() {
+    ParseResult pr;
+    match(stringConst);
+    return pr;
 }
 
 // Expr ::= variableName .....
-ParseResult Parser::parseVariableName ( ) {
-    ParseResult pr ;
-    match ( variableName ) ;
-    if(attemptMatch(leftSquare)){
+ParseResult Parser::parseVariableName() {
+    ParseResult pr;
+    match(variableName);
+    if (attemptMatch(leftSquare)) {
         parseExpr(0);
         match(colon);
         parseExpr(0);
         match(rightSquare);
     }
-    //Expr ::= varableName '(' Expr ')'        //NestedOrFunctionCall
-    else if(attemptMatch(leftParen)){
+    // Expr ::= varableName '(' Expr ')'        //NestedOrFunctionCall
+    else if (attemptMatch(leftParen)) {
         parseExpr(0);
         match(rightParen);
     }
-    //Expr := variableName
-    else{
-        // variable 
+    // Expr := variableName
+    else {
+        // variable
     }
-    return pr ;
+    return pr;
 }
 
 
 // Expr ::= leftParen Expr rightParen
-ParseResult Parser::parseNestedExpr ( ) {
-    ParseResult pr ;
-    match ( leftParen ) ;
-    parseExpr(0) ; 
-    match(rightParen) ;
-    return pr ;
+ParseResult Parser::parseNestedExpr() {
+    ParseResult pr;
+    match(leftParen);
+    parseExpr(0);
+    match(rightParen);
+    return pr;
 }
 
-//Expr ::= 'if' Expr 'then' Expr 'else' Expr  
-ParseResult Parser::parseIfExpr(){  
-     ParseResult pr ; 
-    
+// Expr ::= 'if' Expr 'then' Expr 'else' Expr
+ParseResult Parser::parseIfExpr() {
+    ParseResult pr;
+
     match(ifKwd);
     parseExpr(0);
     match(thenKwd);
@@ -372,60 +409,59 @@ ParseResult Parser::parseIfExpr(){
 }
 
 
-// Expr ::= 'let' Stmts 'in' Expr 'end' 
-ParseResult Parser::parseLetExpr(){
-   ParseResult pr ;
-   match(letKwd);
-   parseStmts();
-   match(inKwd);
-   parseExpr(0);
-   match(endKwd);
+// Expr ::= 'let' Stmts 'in' Expr 'end'
+ParseResult Parser::parseLetExpr() {
+    ParseResult pr;
+    match(letKwd);
+    parseStmts();
+    match(inKwd);
+    parseExpr(0);
+    match(endKwd);
 
-   return pr;
+    return pr;
 }
 
-// Expr ::= '!' Expr 
-ParseResult Parser::parseNotExpr () {
-    ParseResult pr ;
-    match ( notOp ) ;
-    parseExpr( 0 ); 
-    return pr ;
-
+// Expr ::= '!' Expr
+ParseResult Parser::parseNotExpr() {
+    ParseResult pr;
+    match(notOp);
+    parseExpr(0);
+    return pr;
 }
 // Expr ::= Expr plusSign Expr
-ParseResult Parser::parseAddition ( ParseResult prLeft ) {
-    // parser has already matched left expression 
-    ParseResult pr ;
-    match ( plusSign ) ;
-    parseExpr( prevToken->lbp() ); 
-    return pr ;
+ParseResult Parser::parseAddition(ParseResult prLeft) {
+    // parser has already matched left expression
+    ParseResult pr;
+    match(plusSign);
+    parseExpr(prevToken->lbp());
+    return pr;
 }
 
 // Expr ::= Expr star Expr
-ParseResult Parser::parseMultiplication ( ParseResult prLeft ) {
-    // parser has already matched left expression 
-    ParseResult pr ;
-    match ( star ) ;
-    parseExpr( prevToken->lbp() ); 
-    return pr ;
+ParseResult Parser::parseMultiplication(ParseResult prLeft) {
+    // parser has already matched left expression
+    ParseResult pr;
+    match(star);
+    parseExpr(prevToken->lbp());
+    return pr;
 }
 
 // Expr ::= Expr dash Expr
-ParseResult Parser::parseSubtraction ( ParseResult prLeft ) {
-    // parser has already matched left expression 
-    ParseResult pr ;
-    match ( dash ) ;
-    parseExpr( prevToken->lbp() ); 
-    return pr ;
+ParseResult Parser::parseSubtraction(ParseResult prLeft) {
+    // parser has already matched left expression
+    ParseResult pr;
+    match(dash);
+    parseExpr(prevToken->lbp());
+    return pr;
 }
 
 // Expr ::= Expr forwardSlash Expr
-ParseResult Parser::parseDivision ( ParseResult prLeft ) {
-    // parser has already matched left expression 
-    ParseResult pr ;
-    match ( forwardSlash ) ;
-    parseExpr( prevToken->lbp() ); 
-    return pr ;
+ParseResult Parser::parseDivision(ParseResult prLeft) {
+    // parser has already matched left expression
+    ParseResult pr;
+    match(forwardSlash);
+    parseExpr(prevToken->lbp());
+    return pr;
 }
 
 
@@ -442,75 +478,70 @@ ParseResult Parser::parseDivision ( ParseResult prLeft ) {
    will depend on what we do in iteration 3 in building an abstract
    syntax tree to decide which method is better.
  */
-ParseResult Parser::parseRelationalExpr ( ParseResult prLeft ) {
-    // parser has already matched left expression 
-    ParseResult pr ;
+ParseResult Parser::parseRelationalExpr(ParseResult prLeft) {
+    // parser has already matched left expression
+    ParseResult pr;
 
-    nextToken( ) ;
+    nextToken();
     // just advance token, since examining it in parseExpr caused
     // this method being called.
-    string op = prevToken->lexeme ;
+    string op = prevToken->lexeme;
 
-    parseExpr( prevToken->lbp() ); 
-    return pr ;
+    parseExpr(prevToken->lbp());
+    return pr;
 }
 
 
 // Helper function used by the parser.
 
-void Parser::match (tokenType tt) {
-    if (! attemptMatch(tt)) {
-        throw ( makeErrorMsgExpected ( tt ) ) ;
+void Parser::match(tokenType tt) {
+    if (!attemptMatch(tt)) {
+        throw(makeErrorMsgExpected(tt));
     }
 }
 
-bool Parser::attemptMatch (tokenType tt) {
-    if (currToken->terminal == tt) { 
-        nextToken() ;
-        return true ;
+bool Parser::attemptMatch(tokenType tt) {
+    if (currToken->terminal == tt) {
+        nextToken();
+        return true;
     }
-    return false ;
+    return false;
 }
 
-bool Parser::nextIs (tokenType tt) {
-    return currToken->terminal == tt ;
-}
+bool Parser::nextIs(tokenType tt) { return currToken->terminal == tt; }
 
-void Parser::nextToken () {
-    if ( currToken == NULL ) 
-        throw ( string("Internal Error: should not call nextToken in unitialized state"));
-    else 
-    if (currToken->terminal == endOfFile && currToken->next == NULL) {
-        prevToken = currToken ;
+void Parser::nextToken() {
+    if (currToken == NULL)
+        throw(string(
+            "Internal Error: should not call nextToken in unitialized state"));
+    else if (currToken->terminal == endOfFile && currToken->next == NULL) {
+        prevToken = currToken;
     } else if (currToken->terminal != endOfFile && currToken->next == NULL) {
-        throw ( makeErrorMsg ( "Error: tokens end with endOfFile" ) ) ;
+        throw(makeErrorMsg("Error: tokens end with endOfFile"));
     } else {
-        prevToken = currToken ;
-        currToken = currToken->next ;
+        prevToken = currToken;
+        currToken = currToken->next;
     }
 }
 
-string Parser::terminalDescription ( tokenType terminal ) {
-    Token *dummyToken = new Token ("",terminal, NULL) ;
-    ExtToken *dummyExtToken = extendToken (this, dummyToken) ;
-    string s = dummyExtToken->description() ;
-    delete dummyToken ;
-    delete dummyExtToken ;
-    return s ;
+string Parser::terminalDescription(tokenType terminal) {
+    Token *dummyToken = new Token("", terminal, NULL);
+    ExtToken *dummyExtToken = extendToken(this, dummyToken);
+    string s = dummyExtToken->description();
+    delete dummyToken;
+    delete dummyExtToken;
+    return s;
 }
 
-string Parser::makeErrorMsgExpected ( tokenType terminal ) {
-    string s = (string) "Expected " + terminalDescription (terminal) +
-        " but found " + currToken->description() ;
-    return s ;
+string Parser::makeErrorMsgExpected(tokenType terminal) {
+    string s = (string) "Expected " + terminalDescription(terminal) +
+               " but found " + currToken->description();
+    return s;
 }
 
-string Parser::makeErrorMsg ( tokenType terminal ) {
-    string s = "Unexpected symbol " + terminalDescription (terminal) ;
-    return s ;
+string Parser::makeErrorMsg(tokenType terminal) {
+    string s = "Unexpected symbol " + terminalDescription(terminal);
+    return s;
 }
 
-string Parser::makeErrorMsg ( const char *msg ) {
-    return msg ;
-}
-
+string Parser::makeErrorMsg(const char *msg) { return msg; }
