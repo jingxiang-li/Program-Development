@@ -72,13 +72,13 @@ public:
         TSM_ASSERT_EQUALS(file + " unparse-2 != unparse-3.", up2, up3);
     }
 
-    // void test_sample_1 ( void ) { unparse_tests ( "sample_1.dsl" ); }
-    // void test_sample_2 ( void ) { unparse_tests ( "sample_2.dsl" ); }
-    // void test_sample_3 ( void ) { unparse_tests ( "sample_3.dsl" ); }
-    // void test_sample_4 ( void ) { unparse_tests ( "sample_4.dsl" ); }
-    // void test_sample_5 ( void ) { unparse_tests ( "sample_5.dsl" ); }
-    // void test_mysample ( void ) { unparse_tests ( "mysample.dsl" ); }
-    // void test_forest_loss ( void ) { unparse_tests ( "forest_loss_v2.dsl" );
-    // }
-    void test_easy_sample(void) { unparse_tests("easysample.dsl"); }
+    void test_sample_1 ( void ) { unparse_tests ( "sample_1.dsl" ); }
+    void test_sample_2 ( void ) { unparse_tests ( "sample_2.dsl" ); }
+    void test_sample_3 ( void ) { unparse_tests ( "sample_3.dsl" ); }
+    void test_sample_4 ( void ) { unparse_tests ( "sample_4.dsl" ); }
+    void test_sample_5 ( void ) { unparse_tests ( "sample_5.dsl" ); }
+    void test_mysample ( void ) { unparse_tests ( "mysample.dsl" ); }
+    void test_forest_loss ( void ) { unparse_tests ( "forest_loss_v2.dsl" );
+    }
+    // void test_easy_sample(void) { unparse_tests("easysample.dsl"); }
 };
