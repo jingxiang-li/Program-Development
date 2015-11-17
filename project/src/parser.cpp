@@ -265,9 +265,11 @@ ParseResult Parser::parseStmt() {
             pr.ast = new IfElseStmt(dynamic_cast<Expr *>(result_expr1.ast),
                                     dynamic_cast<Stmt *>(result_stmt.ast),
                                     dynamic_cast<Stmt *>(result_expr2.ast));
+            pr.ok = true;
         } else {
             pr.ast = new IfStmt(dynamic_cast<Expr *>(result_expr1.ast),
                                 dynamic_cast<Stmt *>(result_stmt.ast));
+            pr.ok = true;
         }
 
     }
