@@ -113,30 +113,38 @@ ParseResult Parser::parseMatrixDecl() {
     ParseResult pr;
     match(matrixKwd);
     match(variableName);
+    string varName(prevToken->lexeme);
 
     // Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '='
     // Expr ';'
     if (attemptMatch(leftSquare)) {
-        parseExpr(0);
+        ParseResult result1 = parseExpr(0);
         match(colon);
-        parseExpr(0);
+        ParseResult result2 = parseExpr(0);
         match(rightSquare);
-        parseVariableName();
+        ParseResult result3 = parseVariableName();
         match(colon);
-        parseVariableName();
+        ParseResult result4= parseVariableName();
         match(assign);
-        parseExpr(0);
+        ParseResult result5 = parseExpr(0);
+        pr.ast = new MatrixLongDecl(varName, dynamic_cast<VarNameExpr *>(result3.ast)->unparse(), 
+        							dynamic_cast<VarNameExpr *>(result4.ast)->unparse(), 
+        							dynamic_cast<Expr *>(result1.ast), 
+        							dynamic_cast<Expr *>(result2.ast), 
+        							dynamic_cast<Expr *>(result3.ast);
+    	pr.ok = true;
     }
     // Decl ::= 'matrix' varName '=' Expr ';'
     else if (attemptMatch(assign)) {
-        parseExpr(0);
+        ParseResult result1 = parseExpr(0);
+        pr.ast = new MatrixShortDecl(varName, dynamic_cast<Expr *>(result1.ast));
+        pr.ok = true;
     } else {
         throw((string) "Bad Syntax of Matrix Decl in in parseMatrixDecl");
     }
 
-    match(semiColon);
-
-    return pr;
+      match(semiColon);
+      return pr;
 }
 // standardDecl
 // Decl ::= integerKwd varName | floatKwd varName | stringKwd varName
@@ -236,8 +244,10 @@ ParseResult Parser::parseStmt() {
     }
     // Stmt ::= '{' Stmts '}'
     else if (attemptMatch(leftCurly)) {
-        parseStmts();
+        ParseResult result_stmts = parseStmts();
         match(rightCurly);
+        pr.ast = new  IfStmt(dynamic_cast<Stmt *>(result_stmts.ast));
+        pr.ok = true;
     }
     // Stmt ::= 'if' '(' Expr ')' Stmt
     // Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
