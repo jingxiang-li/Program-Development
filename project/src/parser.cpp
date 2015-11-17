@@ -149,13 +149,13 @@ ParseResult Parser::parseMatrixDecl() {
     }
     return pr;
 }
+
 // standardDecl
 // Decl ::= integerKwd varName | floatKwd varName | stringKwd varName
 ParseResult Parser::parseStandardDecl() {
     ParseResult pr;
 
     enum declType { int_d, float_d, string_d, bool_d, error_d };
-
     enum declType cur_type = error_d;
 
     if (attemptMatch(intKwd)) {
@@ -342,9 +342,9 @@ ParseResult Parser::parseStmt() {
     } else {
         throw(makeErrorMsg(currToken->terminal) + " while parsing a statement");
     }
-    // Stmt ::= variableName assign Expr semiColon
     return pr;
 }
+
 
 // Expr
 ParseResult Parser::parseExpr(int rbp) {
@@ -447,7 +447,6 @@ ParseResult Parser::parseVariableName() {
     return pr;
 }
 
-
 // Expr ::= leftParen Expr rightParen
 ParseResult Parser::parseNestedExpr() {
     ParseResult pr;
@@ -476,7 +475,6 @@ ParseResult Parser::parseIfExpr() {
     return pr;
 }
 
-
 // Expr ::= 'let' Stmts 'in' Expr 'end'
 ParseResult Parser::parseLetExpr() {
     ParseResult pr;
@@ -500,6 +498,7 @@ ParseResult Parser::parseNotExpr() {
     pr.ok = true;
     return pr;
 }
+
 // Expr ::= Expr plusSign Expr
 ParseResult Parser::parseAddition(ParseResult prLeft) {
     // parser has already matched left expression
