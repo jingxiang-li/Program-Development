@@ -124,27 +124,30 @@ ParseResult Parser::parseMatrixDecl() {
         match(rightSquare);
         ParseResult result3 = parseVariableName();
         match(colon);
-        ParseResult result4= parseVariableName();
+        ParseResult result4 = parseVariableName();
         match(assign);
         ParseResult result5 = parseExpr(0);
-        pr.ast = new MatrixLongDecl(varName, dynamic_cast<VarNameExpr *>(result3.ast)->unparse(), 
-        							dynamic_cast<VarNameExpr *>(result4.ast)->unparse(), 
-        							dynamic_cast<Expr *>(result1.ast), 
-        							dynamic_cast<Expr *>(result2.ast), 
-        							dynamic_cast<Expr *>(result5.ast));
-    	pr.ok = true;
+        match(semiColon);
+
+        pr.ast = new MatrixLongDecl(
+            varName, dynamic_cast<VarNameExpr *>(result3.ast)->unparse(),
+            dynamic_cast<VarNameExpr *>(result4.ast)->unparse(),
+            dynamic_cast<Expr *>(result1.ast),
+            dynamic_cast<Expr *>(result2.ast),
+            dynamic_cast<Expr *>(result5.ast));
+        pr.ok = true;
     }
     // Decl ::= 'matrix' varName '=' Expr ';'
     else if (attemptMatch(assign)) {
         ParseResult result1 = parseExpr(0);
-        pr.ast = new MatrixShortDecl(varName, dynamic_cast<Expr *>(result1.ast));
+        match(semiColon);
+        pr.ast =
+            new MatrixShortDecl(varName, dynamic_cast<Expr *>(result1.ast));
         pr.ok = true;
     } else {
         throw((string) "Bad Syntax of Matrix Decl in in parseMatrixDecl");
     }
-
-      match(semiColon);
-      return pr;
+    return pr;
 }
 // standardDecl
 // Decl ::= integerKwd varName | floatKwd varName | stringKwd varName
@@ -246,63 +249,53 @@ ParseResult Parser::parseStmt() {
     else if (attemptMatch(leftCurly)) {
         ParseResult result_stmts = parseStmts();
         match(rightCurly);
-        pr.ast = new  NestedStmt(dynamic_cast<Stmts *>(result_stmts.ast));
+        pr.ast = new NestedStmt(dynamic_cast<Stmts *>(result_stmts.ast));
         pr.ok = true;
     }
     // Stmt ::= 'if' '(' Expr ')' Stmt
-     else if (attemptMatch(ifKwd)) {
-        match(leftParen);
-        ParseResult result_expr = parseExpr(0);
-        match(rightParen);
-        ParseResult result_stmt = parseStmt();
-		pr.ast = new  IfStmt(dynamic_cast<Expr *>(result_expr.ast),dynamic_cast<Stmt *>(result_stmt.ast));
-        pr.ok = true;
-				
-        if (attemptMatch(elseKwd)) {
-            parseStmt();
-        }
-
-    }
-    
     // Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
     else if (attemptMatch(ifKwd)) {
         match(leftParen);
-        ParseResult result_expr = parseExpr(0);
+        ParseResult result_expr1 = parseExpr(0);
         match(rightParen);
         ParseResult result_stmt = parseStmt();
-        ParseResult result_stmt2 = parseStmt();
-		pr.ast = new  IfElseStmt(dynamic_cast<Expr *>(result_expr.ast), dynamic_cast<Stmt *> 
-		(result_stmt.ast), dynamic_cast<Stmt *>(result_stmt2.ast));
-        pr.ok = true;
-		
+
         if (attemptMatch(elseKwd)) {
-            parseStmt();
+            ParseResult result_expr2 = parseStmt();
+            pr.ast = new IfElseStmt(dynamic_cast<Expr *>(result_expr1.ast),
+                                    dynamic_cast<Stmt *>(result_stmt.ast),
+                                    dynamic_cast<Stmt *>(result_expr2.ast));
+        } else {
+            pr.ast = new IfStmt(dynamic_cast<Expr *>(result_expr1.ast),
+                                dynamic_cast<Stmt *>(result_stmt.ast));
         }
 
     }
-    // Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr ';'
+    // Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr
+    // ';'
     else if (attemptMatch(variableName)) {
-    	string varName(prevToken->lexeme);
+        string varName(prevToken->lexeme);
         if (attemptMatch(leftSquare)) {
-            ParseResult  result_expr = parseExpr(0);
+            ParseResult result_expr = parseExpr(0);
             match(colon);
-            ParseResult  result_expr2 = parseExpr(0);
+            ParseResult result_expr2 = parseExpr(0);
             match(rightSquare);
             match(assign);
             ParseResult result_expr3 = parseExpr(0);
             match(semiColon);
-            pr.ast = new  RangeAssignStmt(varName, dynamic_cast<Expr *>(result_expr.ast), 
-            								dynamic_cast<Expr *> (result_expr2.ast), 
-            								dynamic_cast<Expr *>(result_expr3.ast));
-        } 
-        else {
-		    match(assign);
-		    ParseResult result_expr = parseExpr(0);
-		    match(semiColon);
-		    pr.ast = new AssignStmt(varName, dynamic_cast<Expr *>(result_expr.ast));
-		    pr.ok = true;
+            pr.ast = new RangeAssignStmt(
+                varName, dynamic_cast<Expr *>(result_expr.ast),
+                dynamic_cast<Expr *>(result_expr2.ast),
+                dynamic_cast<Expr *>(result_expr3.ast));
+            pr.ok = true;
+        } else {
+            match(assign);
+            ParseResult result_expr = parseExpr(0);
+            match(semiColon);
+            pr.ast =
+                new AssignStmt(varName, dynamic_cast<Expr *>(result_expr.ast));
+            pr.ok = true;
         }
-
     }
     // Stmt ::= 'print' '(' Expr ')' ';'
     else if (attemptMatch(printKwd)) {
@@ -310,21 +303,23 @@ ParseResult Parser::parseStmt() {
         ParseResult result_expr = parseExpr(0);
         match(rightParen);
         match(semiColon);
-        pr.ast = new  PrintStmt(dynamic_cast<Expr *>(result_expr.ast));
+        pr.ast = new PrintStmt(dynamic_cast<Expr *>(result_expr.ast));
         pr.ok = true;
     }
     // Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
     else if (attemptMatch(repeatKwd)) {
-    	string varName(prevToken->lexeme);
         match(leftParen);
         match(variableName);
+        string varName(prevToken->lexeme);
         match(assign);
         ParseResult result_expr = parseExpr(0);
         match(toKwd);
         ParseResult result_expr2 = parseExpr(0);
         match(rightParen);
         ParseResult result_stmt = parseStmt();
-        pr.ast = new  RepeatStmt(varName,dynamic_cast<Expr *>(result_expr.ast),dynamic_cast<Expr *>(result_expr2.ast), dynamic_cast<Stmt *>(result_stmt.ast));
+        pr.ast = new RepeatStmt(varName, dynamic_cast<Expr *>(result_expr.ast),
+                                dynamic_cast<Expr *>(result_expr2.ast),
+                                dynamic_cast<Stmt *>(result_stmt.ast));
         pr.ok = true;
     }
     // Stmt ::= 'while' '(' Expr ')' Stmt
@@ -333,15 +328,15 @@ ParseResult Parser::parseStmt() {
         ParseResult result_expr = parseExpr(0);
         match(rightParen);
         ParseResult result_stmt = parseStmt();
-        pr.ast = new  WhileStmt(dynamic_cast<Expr *>(result_expr.ast),dynamic_cast<Stmt *>
-        (result_stmt.ast));
+        pr.ast = new WhileStmt(dynamic_cast<Expr *>(result_expr.ast),
+                               dynamic_cast<Stmt *>(result_stmt.ast));
         pr.ok = true;
     }
     // Stmt ::= ';
     else if (attemptMatch(semiColon)) {
-     	pr.ast = new  SemicolonStmt();
-     	pr.ok = true;
         // parsed a skip
+        pr.ast = new SemicolonStmt();
+        pr.ok = true;
     } else {
         throw(makeErrorMsg(currToken->terminal) + " while parsing a statement");
     }
