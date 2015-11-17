@@ -246,63 +246,107 @@ ParseResult Parser::parseStmt() {
     else if (attemptMatch(leftCurly)) {
         ParseResult result_stmts = parseStmts();
         match(rightCurly);
-        pr.ast = new  IfStmt(dynamic_cast<Stmt *>(result_stmts.ast));
+        pr.ast = new  NestedStmt(dynamic_cast<Stmts *>(result_stmts.ast));
         pr.ok = true;
     }
     // Stmt ::= 'if' '(' Expr ')' Stmt
+     else if (attemptMatch(ifKwd)) {
+        match(leftParen);
+        ParseResult result_expr = parseExpr(0);
+        match(rightParen);
+        ParseResult result_stmt = parseStmt();
+		pr.ast = new  IfStmt(dynamic_cast<Expr *>(result_expr.ast),dynamic_cast<Stmt *>(result_stmt.ast));
+        pr.ok = true;
+				
+        if (attemptMatch(elseKwd)) {
+            parseStmt();
+        }
+
+    }
+    
     // Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
     else if (attemptMatch(ifKwd)) {
         match(leftParen);
-        parseExpr(0);
+        ParseResult result_expr = parseExpr(0);
         match(rightParen);
-        parseStmt();
-
+        ParseResult result_stmt = parseStmt();
+        ParseResult result_stmt2 = parseStmt();
+		pr.ast = new  IfElseStmt(dynamic_cast<Expr *>(result_expr.ast), dynamic_cast<Stmt *> 
+		(result_stmt.ast), dynamic_cast<Stmt *>(result_stmt2.ast));
+        pr.ok = true;
+		
         if (attemptMatch(elseKwd)) {
             parseStmt();
         }
 
     }
     // Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr
-    // ';'
     else if (attemptMatch(variableName)) {
         if (attemptMatch(leftSquare)) {
-            parseExpr(0);
+            ParseResult  result_expr = parseExpr(0);
             match(colon);
-            parseExpr(0);
+            ParseResult  result_expr2 = parseExpr(0);
             match(rightSquare);
         }
         match(assign);
-        parseExpr(0);
+        ParseResult result_expr3 = parseExpr(0);
         match(semiColon);
+        pr.ast = new  RangeAssignStmt(varName, dynamic_cast<Expr *>(result_expr.ast), dynamic_cast<Expr *> 
+		(result_expr.ast), dynamic_cast<Expr *>(result_expr2.ast));
+        pr.ok = true;
+
+    }
+    // Stmt ::= varName '=' Expr ';'
+    else if (attemptMatch(variableName)) {
+        if (attemptMatch(leftSquare)) {
+            ParseResult  result_expr = parseExpr(0);
+            match(colon);
+            ParseResult  result_expr2 = parseExpr(0);
+            match(rightSquare);
+        }
+        match(assign);
+        ParseResult result_expr3 = parseExpr(0);
+        match(semiColon);
+        pr.ast = new  AssignStmt(varName, dynamic_cast<Expr *>(result_expr.ast));
+        pr.ok = true;
 
     }
     // Stmt ::= 'print' '(' Expr ')' ';'
     else if (attemptMatch(printKwd)) {
         match(leftParen);
-        parseExpr(0);
+        ParseResult result_expr = parseExpr(0);
         match(rightParen);
         match(semiColon);
+        pr.ast = new  PrintStmt(dynamic_cast<Expr *>(result_expr.ast));
+        pr.ok = true;
     }
     // Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
     else if (attemptMatch(repeatKwd)) {
         match(leftParen);
         match(variableName);
         match(assign);
-        parseExpr(0);
+        ParseResult result_expr = parseExpr(0);
         match(toKwd);
-        parseExpr(0);
+        ParseResult result_expr2 = parseExpr(0);
         match(rightParen);
-        parseStmt();
+        ParseResult result_stmt = parseStmt();
+        pr.ast = new  RepeatStmt(varName,dynamic_cast<Expr *>(result_expr.ast),dynamic_cast<Expr *>(result_expr2.ast), dynamic_cast<Stmt *>(result_stmt.ast));
+        pr.ok = true;
     }
     // Stmt ::= 'while' '(' Expr ')' Stmt
     else if (attemptMatch(whileKwd)) {
         match(leftParen);
-        parseExpr(0);
+        ParseResult result_expr = parseExpr(0);
         match(rightParen);
-        parseStmt();
+        ParseResult result_stmt = parseStmt();
+        pr.ast = new  WhileStmt(dynamic_cast<Expr *>(result_expr.ast),dynamic_cast<Stmt *>
+        (result_stmt.ast));
+        pr.ok = true;
     }
     // Stmt ::= ';
     else if (attemptMatch(semiColon)) {
+     	pr.ast = new  SemicolonStmt();
+     	pr.ok = true;
         // parsed a skip
     } else {
         throw(makeErrorMsg(currToken->terminal) + " while parsing a statement");
@@ -310,7 +354,6 @@ ParseResult Parser::parseStmt() {
     // Stmt ::= variableName assign Expr semiColon
     return pr;
 }
-
 
 // Expr
 ParseResult Parser::parseExpr(int rbp) {
