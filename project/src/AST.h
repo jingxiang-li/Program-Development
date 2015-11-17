@@ -123,10 +123,10 @@ public:
 // Stmt ::= '{' Stmts '}'
 class NestedStmt : public Stmt {
 private:
-    Stmt *st1;
+    Stmts *stmts;
 
 public:
-    NestedStmt(Stmt *_st1);
+    NestedStmt(Stmts *_stmts);
     string unparse();
 };
 

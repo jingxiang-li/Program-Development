@@ -238,8 +238,8 @@ ParseResult Parser::parseStmt() {
     // Stmt ::= Decl
     if (nextIs(intKwd) || nextIs(floatKwd) || nextIs(matrixKwd) ||
         nextIs(stringKwd) || nextIs(boolKwd)) {
-        ParseResult result_decl = parseDecl();
-        pr.ast = new DeclStmt(dynamic_cast<Decl *>(result_decl.ast));
+        ParseResult result1 = parseDecl();
+        pr.ast = new DeclStmt(dynamic_cast<Decl *>(result1.ast));
         pr.ok = true;
     }
     // Stmt ::= '{' Stmts '}'

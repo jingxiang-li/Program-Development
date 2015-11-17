@@ -53,8 +53,8 @@ string DeclStmt::unparse() { return decl->unparse(); }
 
 // NestedStmt, inherits from Stmt
 // Stmt ::= '{' Stmts '}'
-NestedStmt::NestedStmt(Stmt *_st1) { st1 = _st1; }
-string NestedStmt::unparse() { return "{ " + st1->unparse() + " }"; }
+NestedStmt::NestedStmt(Stmts *_stmts) { stmts = _stmts; }
+string NestedStmt::unparse() { return "{ " + stmts->unparse() + " }"; }
 
 
 // IfStmt, inherits from Stmt
@@ -402,7 +402,7 @@ string LetExpr::unparse() {
 // Expr ::= 'if' Expr 'then' Expr 'else' Ex
 IfExpr::IfExpr(Expr *_ex1, Expr *_ex2, Expr *_ex3) {
     ex1 = _ex1;
-    ex1 = _ex2;
+    ex2 = _ex2;
     ex3 = _ex3;
 }
 string IfExpr::unparse() {
