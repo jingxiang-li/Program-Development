@@ -258,27 +258,26 @@ ParseResult Parser::parseStmt() {
         match(leftParen);
         ParseResult result_expr1 = parseExpr(0);
         match(rightParen);
-        ParseResult result_stmt = parseStmt();
+        ParseResult result_stmt1 = parseStmt();
 
         if (attemptMatch(elseKwd)) {
-            ParseResult result_expr2 = parseStmt();
+            ParseResult result_stmt2 = parseStmt();
             pr.ast = new IfElseStmt(dynamic_cast<Expr *>(result_expr1.ast),
-                                    dynamic_cast<Stmt *>(result_stmt.ast),
-                                    dynamic_cast<Stmt *>(result_expr2.ast));
+                                    dynamic_cast<Stmt *>(result_stmt1.ast),
+                                    dynamic_cast<Stmt *>(result_stmt2.ast));
             pr.ok = true;
         } else {
             pr.ast = new IfStmt(dynamic_cast<Expr *>(result_expr1.ast),
-                                dynamic_cast<Stmt *>(result_stmt.ast));
+                                dynamic_cast<Stmt *>(result_stmt1.ast));
             pr.ok = true;
         }
-
     }
     // Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr
     // ';'
     else if (attemptMatch(variableName)) {
         string varName(prevToken->lexeme);
         if (attemptMatch(leftSquare)) {
-            ParseResult result_expr = parseExpr(0);
+            ParseResult result_expr1 = parseExpr(0);
             match(colon);
             ParseResult result_expr2 = parseExpr(0);
             match(rightSquare);
@@ -286,7 +285,7 @@ ParseResult Parser::parseStmt() {
             ParseResult result_expr3 = parseExpr(0);
             match(semiColon);
             pr.ast = new RangeAssignStmt(
-                varName, dynamic_cast<Expr *>(result_expr.ast),
+                varName, dynamic_cast<Expr *>(result_expr1.ast),
                 dynamic_cast<Expr *>(result_expr2.ast),
                 dynamic_cast<Expr *>(result_expr3.ast));
             pr.ok = true;
@@ -314,12 +313,12 @@ ParseResult Parser::parseStmt() {
         match(variableName);
         string varName(prevToken->lexeme);
         match(assign);
-        ParseResult result_expr = parseExpr(0);
+        ParseResult result_expr1 = parseExpr(0);
         match(toKwd);
         ParseResult result_expr2 = parseExpr(0);
         match(rightParen);
         ParseResult result_stmt = parseStmt();
-        pr.ast = new RepeatStmt(varName, dynamic_cast<Expr *>(result_expr.ast),
+        pr.ast = new RepeatStmt(varName, dynamic_cast<Expr *>(result_expr1.ast),
                                 dynamic_cast<Expr *>(result_expr2.ast),
                                 dynamic_cast<Stmt *>(result_stmt.ast));
         pr.ok = true;
