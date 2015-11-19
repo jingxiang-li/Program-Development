@@ -102,7 +102,6 @@ ParseResult Parser::parseProgram() {
     match(rightCurly);
     match(endOfFile);
     pr.ast = new Program(varName, dynamic_cast<Stmts *>(prStmts.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -135,7 +134,6 @@ ParseResult Parser::parseMatrixDecl() {
             dynamic_cast<Expr *>(result1.ast),
             dynamic_cast<Expr *>(result2.ast),
             dynamic_cast<Expr *>(result5.ast));
-        pr.ok = true;
     }
     // Decl ::= 'matrix' varName '=' Expr ';'
     else if (attemptMatch(assign)) {
@@ -143,7 +141,6 @@ ParseResult Parser::parseMatrixDecl() {
         match(semiColon);
         pr.ast =
             new MatrixShortDecl(varName, dynamic_cast<Expr *>(result1.ast));
-        pr.ok = true;
     } else {
         throw((string) "Bad Syntax of Matrix Decl in in parseMatrixDecl");
     }
@@ -196,7 +193,6 @@ ParseResult Parser::parseStandardDecl() {
             throw((string) "Bad Syntax of Standard Decl in parseStandardDecl");
     }
     pr.ast = decl;
-    pr.ok = true;
     return pr;
 }
 
@@ -224,12 +220,10 @@ ParseResult Parser::parseStmts() {
         ParseResult prStmts = parseStmts();
         pr.ast = new SeqStmts(dynamic_cast<Stmt *>(prStmt.ast),
                               dynamic_cast<Stmts *>(prStmts.ast));
-        pr.ok = true;
     } else {
         // Stmts ::=
         // nothing to match.
         pr.ast = new EmptyStmts();
-        pr.ok = true;
     }
     return pr;
 }
@@ -243,14 +237,12 @@ ParseResult Parser::parseStmt() {
         nextIs(stringKwd) || nextIs(boolKwd)) {
         ParseResult result1 = parseDecl();
         pr.ast = new DeclStmt(dynamic_cast<Decl *>(result1.ast));
-        pr.ok = true;
     }
     // Stmt ::= '{' Stmts '}'
     else if (attemptMatch(leftCurly)) {
         ParseResult result_stmts = parseStmts();
         match(rightCurly);
         pr.ast = new NestedStmt(dynamic_cast<Stmts *>(result_stmts.ast));
-        pr.ok = true;
     }
     // Stmt ::= 'if' '(' Expr ')' Stmt
     // Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
@@ -265,11 +257,9 @@ ParseResult Parser::parseStmt() {
             pr.ast = new IfElseStmt(dynamic_cast<Expr *>(result_expr1.ast),
                                     dynamic_cast<Stmt *>(result_stmt1.ast),
                                     dynamic_cast<Stmt *>(result_stmt2.ast));
-            pr.ok = true;
         } else {
             pr.ast = new IfStmt(dynamic_cast<Expr *>(result_expr1.ast),
                                 dynamic_cast<Stmt *>(result_stmt1.ast));
-            pr.ok = true;
         }
     }
     // Stmt ::= varName '=' Expr ';'  | varName '[' Expr ':' Expr ']' '=' Expr
@@ -288,14 +278,12 @@ ParseResult Parser::parseStmt() {
                 varName, dynamic_cast<Expr *>(result_expr1.ast),
                 dynamic_cast<Expr *>(result_expr2.ast),
                 dynamic_cast<Expr *>(result_expr3.ast));
-            pr.ok = true;
         } else {
             match(assign);
             ParseResult result_expr = parseExpr(0);
             match(semiColon);
             pr.ast =
                 new AssignStmt(varName, dynamic_cast<Expr *>(result_expr.ast));
-            pr.ok = true;
         }
     }
     // Stmt ::= 'print' '(' Expr ')' ';'
@@ -305,7 +293,6 @@ ParseResult Parser::parseStmt() {
         match(rightParen);
         match(semiColon);
         pr.ast = new PrintStmt(dynamic_cast<Expr *>(result_expr.ast));
-        pr.ok = true;
     }
     // Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
     else if (attemptMatch(repeatKwd)) {
@@ -321,7 +308,6 @@ ParseResult Parser::parseStmt() {
         pr.ast = new RepeatStmt(varName, dynamic_cast<Expr *>(result_expr1.ast),
                                 dynamic_cast<Expr *>(result_expr2.ast),
                                 dynamic_cast<Stmt *>(result_stmt.ast));
-        pr.ok = true;
     }
     // Stmt ::= 'while' '(' Expr ')' Stmt
     else if (attemptMatch(whileKwd)) {
@@ -331,13 +317,11 @@ ParseResult Parser::parseStmt() {
         ParseResult result_stmt = parseStmt();
         pr.ast = new WhileStmt(dynamic_cast<Expr *>(result_expr.ast),
                                dynamic_cast<Stmt *>(result_stmt.ast));
-        pr.ok = true;
     }
     // Stmt ::= ';
     else if (attemptMatch(semiColon)) {
         // parsed a skip
         pr.ast = new SemicolonStmt();
-        pr.ok = true;
     } else {
         throw(makeErrorMsg(currToken->terminal) + " while parsing a statement");
     }
@@ -371,7 +355,6 @@ ParseResult Parser::parseTrueKwd() {
     ParseResult pr;
     match(trueKwd);
     pr.ast = new TrueExpr();
-    pr.ok = true;
     return pr;
 }
 
@@ -380,7 +363,6 @@ ParseResult Parser::parseFalseKwd() {
     ParseResult pr;
     match(falseKwd);
     pr.ast = new FalseExpr();
-    pr.ok = true;
     return pr;
 }
 
@@ -390,7 +372,6 @@ ParseResult Parser::parseIntConst() {
     match(intConst);
     int val = stoi(prevToken->lexeme);
     pr.ast = new IntExpr(val);
-    pr.ok = true;
     return pr;
 }
 
@@ -400,7 +381,6 @@ ParseResult Parser::parseFloatConst() {
     match(floatConst);
     double val = stod(prevToken->lexeme);
     pr.ast = new FloatExpr(val);
-    pr.ok = true;
     return pr;
 }
 
@@ -410,7 +390,6 @@ ParseResult Parser::parseStringConst() {
     match(stringConst);
     string val = prevToken->lexeme;
     pr.ast = new StringExpr(val);
-    pr.ok = true;
     return pr;
 }
 
@@ -427,7 +406,6 @@ ParseResult Parser::parseVariableName() {
         match(rightSquare);
         pr.ast = new MatrixExpr(varName, dynamic_cast<Expr *>(result1.ast),
                                 dynamic_cast<Expr *>(result2.ast));
-        pr.ok = true;
     }
     // Expr ::= varableName '(' Expr ')'        //NestedOrFunctionCall
     else if (attemptMatch(leftParen)) {
@@ -435,13 +413,11 @@ ParseResult Parser::parseVariableName() {
         match(rightParen);
         pr.ast = new NestedOrFunctionCallExpr(
             varName, dynamic_cast<Expr *>(result1.ast));
-        pr.ok = true;
     }
     // Expr := variableName
     else {
         // variable
         pr.ast = new VarNameExpr(varName);
-        pr.ok = true;
     }
     return pr;
 }
@@ -453,7 +429,6 @@ ParseResult Parser::parseNestedExpr() {
     ParseResult result1 = parseExpr(0);
     match(rightParen);
     pr.ast = new NestedExpr(dynamic_cast<Expr *>(result1.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -470,7 +445,6 @@ ParseResult Parser::parseIfExpr() {
     pr.ast = new IfExpr(dynamic_cast<Expr *>(result1.ast),
                         dynamic_cast<Expr *>(result2.ast),
                         dynamic_cast<Expr *>(result3.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -484,7 +458,6 @@ ParseResult Parser::parseLetExpr() {
     match(endKwd);
     pr.ast = new LetExpr(dynamic_cast<Stmts *>(result1.ast),
                          dynamic_cast<Expr *>(result2.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -494,7 +467,6 @@ ParseResult Parser::parseNotExpr() {
     match(notOp);
     ParseResult result1 = parseExpr(0);
     pr.ast = new NotExpr(dynamic_cast<Expr *>(result1.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -506,7 +478,6 @@ ParseResult Parser::parseAddition(ParseResult prLeft) {
     ParseResult result1 = parseExpr(prevToken->lbp());
     pr.ast = new AddExpr(dynamic_cast<Expr *>(prLeft.ast),
                          dynamic_cast<Expr *>(result1.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -518,7 +489,6 @@ ParseResult Parser::parseMultiplication(ParseResult prLeft) {
     ParseResult result1 = parseExpr(prevToken->lbp());
     pr.ast = new MultiplyExpr(dynamic_cast<Expr *>(prLeft.ast),
                               dynamic_cast<Expr *>(result1.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -530,7 +500,6 @@ ParseResult Parser::parseSubtraction(ParseResult prLeft) {
     ParseResult result1 = parseExpr(prevToken->lbp());
     pr.ast = new SubtractExpr(dynamic_cast<Expr *>(prLeft.ast),
                               dynamic_cast<Expr *>(result1.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -542,7 +511,6 @@ ParseResult Parser::parseDivision(ParseResult prLeft) {
     ParseResult result1 = parseExpr(prevToken->lbp());
     pr.ast = new DevideExpr(dynamic_cast<Expr *>(prLeft.ast),
                             dynamic_cast<Expr *>(result1.ast));
-    pr.ok = true;
     return pr;
 }
 
@@ -593,7 +561,6 @@ ParseResult Parser::parseRelationalExpr(ParseResult prLeft) {
         throw((string) "Bad Syntax of Relational Expr in parseRelationalExpr");
 
     pr.ast = ex;
-    pr.ok = true;
     return pr;
 }
 
