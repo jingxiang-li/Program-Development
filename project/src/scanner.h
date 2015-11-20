@@ -107,9 +107,7 @@ public:
      */
     Scanner();
 
-    /**
-     * Destructor of Scanner, delete the token list and regex_array
-     */
+    // Destructor of Scanner, delete the token list and regex_array
     // ~Scanner();
 
     /**

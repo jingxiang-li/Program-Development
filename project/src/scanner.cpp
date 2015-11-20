@@ -32,9 +32,7 @@ Scanner::Scanner() {
     initializeRegex();
 }
 
-/**
- * Destructor of Scanner, delete the token list and regex_array
- */
+// Destructor of Scanner, delete the token list and regex_array
 // Scanner::~Scanner() {
 //     // delete regex_array
 //     delete[] regex_array;

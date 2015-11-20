@@ -22,7 +22,9 @@ using namespace std;
 //===================================================================
 // Node
 
-// Node, super class, abstract, interface
+/**
+ * super class Node in the Abstract Syntax Tree (AST)
+ */
 class Node {
 public:
     virtual string unparse() = 0;
