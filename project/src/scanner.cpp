@@ -33,18 +33,18 @@ Scanner::Scanner() {
 }
 
 // Destructor of Scanner, delete the token list and regex_array
-// Scanner::~Scanner() {
-//     // delete regex_array
-//     delete[] regex_array;
+/*Scanner::~Scanner() {
+    // delete regex_array
+    delete[] regex_array;
 
-//     // delete Token list
-//     Token *tmp;
-//     if (NULL != head) {
-//         tmp = head;
-//         head = head->next;
-//         delete tmp;
-//     }
-// }
+    // delete Token list
+    Token *tmp;
+    if (NULL != head) {
+        tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+}*/
 
 /**
  * given the input text and the token type, return the length of the

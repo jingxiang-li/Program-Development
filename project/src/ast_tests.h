@@ -1,3 +1,24 @@
+/***
+ * This file contains test suits for classes in Abstract Syntax Tree (AST)
+ *
+ * Modified by:
+ *     Jingxiang Li, Tanoja Sunkam
+ *
+ *
+ * Test Log:
+ *
+ * Implement Code for test_easy_sample from 11/14/2015 to 11/15/2015
+ *
+ * Pass test_easy_sample on 11/15/2015
+ *
+ * Implement Code for test_sample_1, test_sample_2, test_sample_3,
+ * test_sample_4, test_sample_5, test_mysample and test_forest_loss
+ * from 11/15/2015 to 11/17/2015
+ *
+ * Pass test_sample_1, test_sample_2, test_sample_3, test_sample_4,
+ * test_sample_5, test_mysample and test_forest_loss on 11/17/2015
+ */
+
 #include <cxxtest/TestSuite.h>
 #include <iostream>
 #include "parser.h"
@@ -14,6 +35,12 @@ public:
     Parser p;
     ParseResult pr;
 
+    /**
+     * make argv from two c-strings
+     * @param  a0 the first c-string
+     * @param  a1 the second c-string
+     * @return    pointer to argv
+     */
     char **makeArgs(const char *a0, const char *a1) {
         char **aa = (char **)malloc(sizeof(char *) * 2);
         aa[0] = (char *)malloc(sizeof(char) * (strlen(a0) + 1));
@@ -23,16 +50,29 @@ public:
         return aa;
     }
 
+    /**
+     * write text to file
+     * @param text     string of text
+     * @param filename path to the target file
+     */
     void writeFile(const string text, const string filename) {
         ofstream out(filename.c_str());
         out << (string)text << endl;
     }
 
+    /**
+     * read text from file
+     * @param  fn path to the file
+     * @return    c-string of text
+     */
     char *readFile(const char *fn) {
         return readInput(2, makeArgs("translator", fn));
     }
 
-
+    /**
+     * Helper function to test the unparse functions in AST
+     * @param file path to a CDAL language source file
+     */
     void unparse_tests(string file) {
         string path = "../samples/" + file;
 
@@ -72,13 +112,34 @@ public:
         TSM_ASSERT_EQUALS(file + " unparse-2 != unparse-3.", up2, up3);
     }
 
-    void test_sample_1 ( void ) { unparse_tests ( "sample_1.dsl" ); }
-    void test_sample_2 ( void ) { unparse_tests ( "sample_2.dsl" ); }
-    void test_sample_3 ( void ) { unparse_tests ( "sample_3.dsl" ); }
-    void test_sample_4 ( void ) { unparse_tests ( "sample_4.dsl" ); }
-    void test_sample_5 ( void ) { unparse_tests ( "sample_5.dsl" ); }
-    void test_mysample ( void ) { unparse_tests ( "mysample.dsl" ); }
-    void test_forest_loss ( void ) { unparse_tests ( "forest_loss_v2.dsl" );
-    }
+    /**
+     * test parser using sample_1.dsl
+     */
+    void test_sample_1(void) { unparse_tests("sample_1.dsl"); }
+    /**
+     * test parser using sample_2.dsl
+     */
+    void test_sample_2(void) { unparse_tests("sample_2.dsl"); }
+    /**
+     * test parser using sample_3.dsl
+     */
+    void test_sample_3(void) { unparse_tests("sample_3.dsl"); }
+    /**
+     * test parser using sample_4.dsl
+     */
+    void test_sample_4(void) { unparse_tests("sample_4.dsl"); }
+    /**
+     * test parser using sample_5.dsl
+     */
+    void test_sample_5(void) { unparse_tests("sample_5.dsl"); }
+    /**
+     * test parser using mysample.dsl
+     */
+    void test_mysample(void) { unparse_tests("mysample.dsl"); }
+    /**
+     * test parser using forest_loss_v2.dsl
+     */
+    void test_forest_loss(void) { unparse_tests("forest_loss_v2.dsl"); }
+
     // void test_easy_sample(void) { unparse_tests("easysample.dsl"); }
 };

@@ -1,4 +1,4 @@
-/**
+/***
  * AST: a tree representation of the abstract syntactic structure of source
  * code written in a programming language
  *
@@ -27,8 +27,18 @@ using namespace std;
  */
 class Node {
 public:
+    /**
+     * Unparse Node to CDAL source code
+     * @return CDAL source code
+     */
     virtual string unparse() = 0;
+
+    /**
+     * Translate Node to Cpp source code
+     * @return Cpp source code
+     */
     virtual string cppCode() = 0;
+
     virtual ~Node() {}
 };
 
@@ -36,7 +46,9 @@ public:
 //===================================================================
 // Subclasses of Node
 
-// Stmts, abstract class, inherits from Node
+/**
+ * Stmts in AST, abstract class
+ */
 class Stmts : public Node {
 public:
     virtual string unparse() { return string("this is pure virtual"); }
@@ -44,7 +56,9 @@ public:
     virtual ~Stmts() {}
 };
 
-// Stmt, abstract class, inherits from Node
+/**
+ * Stmt in AST, abstract class
+ */
 class Stmt : public Node {
 public:
     virtual string unparse() { return string("this is pure virtual"); }
@@ -52,7 +66,9 @@ public:
     virtual ~Stmt() {}
 };
 
-// Decl, abstract class, inherits from Node
+/**
+ * Decl in AST, abstract class
+ */
 class Decl : public Node {
 public:
     virtual string unparse() { return string("this is pure virtual"); }
@@ -60,7 +76,9 @@ public:
     virtual ~Decl() {}
 };
 
-// Expr, abstract class, inherits from Node
+/**
+ * Expr in AST, abstract class
+ */
 class Expr : public Node {
 public:
     virtual string unparse() { return string("this is pure virtual"); }
@@ -68,8 +86,11 @@ public:
     virtual ~Expr() {}
 };
 
-// Program, concrete class, inherits from Node
-// Program ::= varName '(' ')' '{' Stmts '}'
+/**
+ * Program in AST
+ *
+ * Program ::= varName '(' ')' '{' Stmts '}'
+ */
 class Program : public Node {
 private:
     string varName;
@@ -85,8 +106,9 @@ public:
 //=========================================================
 // Subclasses of Stmts
 
-// EmptyStmts, inherits from Stmts
-// Stmts ::= <<empty>>
+/**
+ * Stmts ::= <<empty>>
+ */
 class EmptyStmts : public Stmts {
 public:
     EmptyStmts();
@@ -94,8 +116,9 @@ public:
     string cppCode();
 };
 
-// SeqStmts, inherits from Stmts
-// Stmts ::= Stmt Stmts
+/**
+ * Stmts ::= Stmt Stmts
+ */
 class SeqStmts : public Stmts {
 private:
     Stmt *st1;
@@ -110,8 +133,9 @@ public:
 //========================================================
 // Subclasses of Stmt
 
-// DeclStmt, inherits from Stmt
-// Stmt ::= Decl
+/**
+ * Stmt ::= Decl
+ */
 class DeclStmt : public Stmt {
 private:
     Decl *decl;
@@ -121,8 +145,9 @@ public:
     string unparse();
 };
 
-// NestedStmt, inherits from Stmt
-// Stmt ::= '{' Stmts '}'
+/**
+ * Stmt ::= '{' Stmts '}'
+ */
 class NestedStmt : public Stmt {
 private:
     Stmts *stmts;
@@ -132,8 +157,9 @@ public:
     string unparse();
 };
 
-// IfStmt, inherits from Stmt
-// Stmt ::= 'if' '(' Expr ')' Stmt
+/**
+ * Stmt ::= 'if' '(' Expr ')' Stmt
+ */
 class IfStmt : public Stmt {
 private:
     Expr *ex1;
@@ -144,8 +170,9 @@ public:
     string unparse();
 };
 
-// IfElseStmt, inherits from Stmt
-// Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
+/**
+ * Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
+ */
 class IfElseStmt : public Stmt {
 private:
     Expr *ex1;
@@ -157,8 +184,9 @@ public:
     string unparse();
 };
 
-// AssignStmt, inherits from Stmt
-// Stmt ::= varName '=' Expr ';'
+/**
+ * Stmt ::= varName '=' Expr ';'
+ */
 class AssignStmt : public Stmt {
 private:
     string varName;
@@ -169,8 +197,9 @@ public:
     string unparse();
 };
 
-// RangeAssginStmt, inherits from Stmt
-// Stmt ::= varName '[' Expr ':' Expr ']' '=' Expr ';'
+/**
+ * Stmt ::= varName '[' Expr ':' Expr ']' '=' Expr ';'
+ */
 class RangeAssignStmt : public Stmt {
 private:
     string varName;
@@ -181,8 +210,9 @@ public:
     string unparse();
 };
 
-// PrintStmt, inherits from Stmt
-// Stmt ::= 'print' '(' Expr ')' ';'
+/**
+ * Stmt ::= 'print' '(' Expr ')' ';'
+ */
 class PrintStmt : public Stmt {
 private:
     Expr *ex1;
@@ -192,8 +222,9 @@ public:
     string unparse();
 };
 
-// RepeatStmt, inherits from Stmt
-// Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
+/**
+ * Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
+ */
 class RepeatStmt : public Stmt {
 private:
     string varName;
@@ -205,8 +236,9 @@ public:
     string unparse();
 };
 
-// WhileStmt, inherits from Stmt
-// Stmt ::= 'while' '(' Expr ')' Stmt
+/**
+ * Stmt ::= 'while' '(' Expr ')' Stmt
+ */
 class WhileStmt : public Stmt {
 private:
     Expr *ex1;
@@ -217,8 +249,9 @@ public:
     string unparse();
 };
 
-// SemicolonStmt, inherits from Stmt
-// Stmt ::= ';'
+/**
+ * Stmt ::= ';'
+ */
 class SemicolonStmt : public Stmt {
 public:
     SemicolonStmt();
@@ -229,8 +262,9 @@ public:
 //========================================================
 // Subclasses of Decl
 
-// IntDecl
-// Decl ::= 'int' varName ';'
+/**
+ * Decl ::= 'int' varName ';'
+ */
 class IntDecl : public Decl {
     string varName;
 
@@ -239,8 +273,9 @@ public:
     string unparse();
 };
 
-// FloatDecl
-// Decl ::= 'float' varName ';'
+/**
+ * Decl ::= 'float' varName ';'
+ */
 class FloatDecl : public Decl {
     string varName;
 
@@ -249,8 +284,9 @@ public:
     string unparse();
 };
 
-// StringDecl
-// Decl ::= 'string' varName ';'
+/**
+ * Decl ::= 'string' varName ';'
+ */
 class StringDecl : public Decl {
     string varName;
 
@@ -259,8 +295,9 @@ public:
     string unparse();
 };
 
-// BooleanDecl
-// Decl ::= 'boolean' varName ';'
+/**
+ * Decl ::= 'boolean' varName ';'
+ */
 class BooleanDecl : public Decl {
     string varName;
 
@@ -269,9 +306,10 @@ public:
     string unparse();
 };
 
-// MatrixLongDecl
-// Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '=' Expr
-// ';'
+/**
+ * Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName '=' Expr
+ * ';'
+ */
 class MatrixLongDecl : public Decl {
     string varName1, varName2, varName3;
     Expr *ex1, *ex2, *ex3;
@@ -282,8 +320,9 @@ public:
     string unparse();
 };
 
-// MatrixShortDecl
-// Decl ::= 'matrix' varName '=' Expr ';'
+/**
+ * Decl ::= 'matrix' varName '=' Expr ';'
+ */
 class MatrixShortDecl : public Decl {
     string varName;
     Expr *ex1;
@@ -297,8 +336,9 @@ public:
 //========================================================
 // Subclasses of Expr
 
-// VarNameExpr
-// Expr ::= varName
+/**
+ * Expr ::= varName
+ */
 class VarNameExpr : public Expr {
 private:
     string varName;
@@ -308,8 +348,9 @@ public:
     string unparse();
 };
 
-// IntExpr
-// Expr ::= integerConst
+/**
+ * Expr ::= integerConst
+ */
 class IntExpr : public Expr {
     int val;
 
@@ -318,8 +359,9 @@ public:
     string unparse();
 };
 
-// FloatExpr
-// Expr ::= floatConst
+/**
+ * Expr ::= floatConst
+ */
 class FloatExpr : public Expr {
     double val;
 
@@ -328,8 +370,9 @@ public:
     string unparse();
 };
 
-// StringExpr
-// Expr ::= stringConst
+/**
+ * Expr ::= stringConst
+ */
 class StringExpr : public Expr {
     string val;
 
@@ -338,24 +381,27 @@ public:
     string unparse();
 };
 
-// TrueExpr
-// Expr ::= 'true'
+/**
+ * Expr ::= 'true'
+ */
 class TrueExpr : public Expr {
 public:
     TrueExpr();
     string unparse();
 };
 
-// FalseExpr
-// Expr ::= 'false'
+/**
+ * Expr ::= 'false'
+ */
 class FalseExpr : public Expr {
 public:
     FalseExpr();
     string unparse();
 };
 
-// MultiplyExpr
-// Expr ::= Expr '*' Expr
+/**
+ * Expr ::= Expr '*' Expr
+ */
 class MultiplyExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -364,8 +410,9 @@ public:
     string unparse();
 };
 
-// DevideExpr
-// Expr ::= Expr '/' Expr
+/**
+ * Expr ::= Expr '/' Expr
+ */
 class DevideExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -374,8 +421,9 @@ public:
     string unparse();
 };
 
-// AddExpr
-// Expr ::= Expr '+' Expr
+/**
+ * Expr ::= Expr '+' Expr
+ */
 class AddExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -384,8 +432,9 @@ public:
     string unparse();
 };
 
-// SubtractExpr
-// Expr ::= Expr '-' Expr
+/**
+ * Expr ::= Expr '-' Expr
+ */
 class SubtractExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -394,8 +443,9 @@ public:
     string unparse();
 };
 
-// GreaterExpr
-// Expr ::= Expr '>' Expr
+/**
+ * Expr ::= Expr '>' Expr
+ */
 class GreaterExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -404,8 +454,9 @@ public:
     string unparse();
 };
 
-// GreaterEqualExpr
-// Expr ::= Expr '>=' Expr
+/**
+ * Expr ::= Expr '>=' Expr
+ */
 class GreaterEqualExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -414,8 +465,9 @@ public:
     string unparse();
 };
 
-// LessExpr
-// Expr ::= Expr '<' Expr
+/**
+ * Expr ::= Expr '<' Expr
+ */
 class LessExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -424,8 +476,9 @@ public:
     string unparse();
 };
 
-// LessEqualExpr
-// Expr ::= Expr '<=' Expr
+/**
+ * Expr ::= Expr '<=' Expr
+ */
 class LessEqualExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -434,8 +487,9 @@ public:
     string unparse();
 };
 
-// EqualEqualExpr
-// Expr ::= Expr '==' Expr
+/**
+ * Expr ::= Expr '==' Expr
+ */
 class EqualEqualExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -444,8 +498,9 @@ public:
     string unparse();
 };
 
-// NotEqualExpr
-// Expr ::= Expr '!=' Expr
+/**
+ * Expr ::= Expr '!=' Expr
+ */
 class NotEqualExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -454,8 +509,9 @@ public:
     string unparse();
 };
 
-// AndExpr
-// Expr ::= Expr '&&' Expr
+/**
+ * Expr ::= Expr '&&' Expr
+ */
 class AndExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -464,8 +520,9 @@ public:
     string unparse();
 };
 
-// OrExpr
-// Expr ::= Expr '||' Expr
+/**
+ * Expr ::= Expr '||' Expr
+ */
 class OrExpr : public Expr {
     Expr *ex1, *ex2;
 
@@ -474,8 +531,9 @@ public:
     string unparse();
 };
 
-// MatrixExpr
-// Expr ::= varName '[' Expr ':' Expr ']'
+/**
+ * Expr ::= varName '[' Expr ':' Expr ']'
+ */
 class MatrixExpr : public Expr {
     string varName;
     Expr *ex1, *ex2;
@@ -485,8 +543,9 @@ public:
     string unparse();
 };
 
-// NestedOrFunctionCallExpr
-// Expr ::= varName '(' Expr ')'
+/**
+ * Expr ::= varName '(' Expr ')'
+ */
 class NestedOrFunctionCallExpr : public Expr {
     string varName;
     Expr *ex1;
@@ -496,8 +555,9 @@ public:
     string unparse();
 };
 
-// NestedExpr
-// Expr ::= '(' Expr ')'
+/**
+ * Expr ::= '(' Expr ')'
+ */
 class NestedExpr : public Expr {
     Expr *ex1;
 
@@ -506,8 +566,9 @@ public:
     string unparse();
 };
 
-// LetExpr
-// Expr ::= 'let' Stmts 'in' Expr 'end'
+/**
+ * Expr ::= 'let' Stmts 'in' Expr 'end'
+ */
 class LetExpr : public Expr {
     Stmts *stmts;
     Expr *ex1;
@@ -517,8 +578,9 @@ public:
     string unparse();
 };
 
-// IfExpr
-// Expr ::= 'if' Expr 'then' Expr 'else' Expr
+/**
+ * Expr ::= 'if' Expr 'then' Expr 'else' Expr
+ */
 class IfExpr : public Expr {
     Expr *ex1, *ex2, *ex3;
 
@@ -527,8 +589,9 @@ public:
     string unparse();
 };
 
-// NotExpr
-// Expr ::= '!' Expr
+/**
+ * Expr ::= '!' Expr
+ */
 class NotExpr : public Expr {
     Expr *ex1;
 
