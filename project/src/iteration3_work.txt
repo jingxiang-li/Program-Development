@@ -1,0 +1,20 @@
+Tanoja Sunkam (Sunka004)
+Jingxiang Li  (Lixx3899)
+
+Division of Work Statement
+
+For the AST.h file,  we both divided the work equally. Tanoja designed classes for Stmt, Stmts, Program, Decl and Jingxiang designed classes and subclasses for Node and Expr.
+For the AST.cpp file, we both divided the work equally. Tanoja finished implementing classes for Stmt, Stmts, Program, Decl and Jingxiang finished implementing classes and subclasses for Node and Expr.
+For the parser.cpp file, Jinxiang wrote functions for parseProgram, parseStandardDecl, and all parseExpr.
+The rest of the functions in this file were written by Tanoja.
+We both worked together to debug the errors in the AST.h, AST.cpp, and parser.cpp files.
+We both divided the work equally for Writing Assignment 2, Developing the UML Deisgn.
+We split worked on parts of the UML diagram separaelty and then combined our diagrams together in the Draw.io online application and turned it in as a pdf file on github in our team repository.
+For Writing Assignment 3, Documenting your solution to iteration 3, we wrote comments to comply to dOxygen and we added comments in AST.h, AST.cpp, parser.cpp, and ast_tests.h.
+
+
+
+
+
+
+
