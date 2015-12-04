@@ -7,9 +7,9 @@
 main() {
 
   // Read in satellite data - To Design
-  matrix data = readMatrix ( "../samples/myData.dat" ) ;
+  matrix data = matrixRead ( "../samples/myData.dat" ) ;
 
- int rows;
+  int rows;
   rows = numRows(data);
   int cols;
   cols = numCols(data);
@@ -42,23 +42,22 @@ main() {
             float diff;
             diff = 0;
             int k;
-            repeat(k = 0 to season_length-1) {
+            repeat(k = 0  to  season_length-1) {
               diff = diff + pt[i:k] - pt[j:k];
             }
           in 
             diff / season_length
           end;
 
-  
-      matrix modelAvgScore[years: 1] yr:dontcare =
+      matrix modelAvgScore[years: 1] yr: dontcare =
         let
           int x;
           int y;
          
           float score1;
           score1 = 0.0;
-          repeat(x = 0 to yr) {
-            repeat(y = yr+1 to years-1) {
+          repeat(x = 0  to  yr) {
+            repeat(y = yr+1  to  years-1) {
               score1 = score1 + comparisonMatrix[x:y];
             }
           }
@@ -66,8 +65,8 @@ main() {
          
           float score2;
           score2 = 0.0;
-          repeat(x = 0 to yr) {
-            repeat(y = 0 to yr) {
+          repeat(x = 0  to  yr) {
+            repeat(y = 0  to  yr) {
               score2 = score2 + comparisonMatrix[x:y];
             }
           }
@@ -75,8 +74,8 @@ main() {
          
           float score3;
           score3 = 0.0;
-          repeat(x = yr+1 to years-1) {
-            repeat(y = yr+1 to years-1) {
+          repeat(x = yr+1  to  years-1) {
+            repeat(y = yr+1  to  years-1) {
               score3 = score3 + comparisonMatrix[x:y];
             }
           }
@@ -90,7 +89,7 @@ main() {
       maximum = 0.0-25;
       int k;
       k = 0;
-      repeat(k = 0 to years-1) {
+      repeat(k = 0  to  years-1) {
         if(modelAvgScore[k:0] > maximum) {
            maximum = modelAvgScore[k:0] ;
         }
@@ -102,8 +101,8 @@ main() {
     
   // Output results  
   int j;
-  repeat(j = 0 to rows-1) {
-    //print(avgScore[j:0]);
+  repeat(j = 0  to  rows-1) {
+    print(avgScore[j:0]);
     print("\n");
   }
   
