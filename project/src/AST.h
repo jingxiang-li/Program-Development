@@ -127,6 +127,7 @@ private:
 public:
     SeqStmts(Stmt *_st1, Stmts *_stmts);
     string unparse();
+    string cppCode();
 };
 
 
@@ -143,6 +144,7 @@ private:
 public:
     DeclStmt(Decl *_decl);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -155,6 +157,7 @@ private:
 public:
     NestedStmt(Stmts *_stmts);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -168,6 +171,7 @@ private:
 public:
     IfStmt(Expr *_ex1, Stmt *_st1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -182,6 +186,7 @@ private:
 public:
     IfElseStmt(Expr *_ex1, Stmt *_st1, Stmt *_st2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -195,6 +200,7 @@ private:
 public:
     AssignStmt(string _varName, Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -208,6 +214,7 @@ private:
 public:
     RangeAssignStmt(string _varName, Expr *_ex1, Expr *_ex2, Expr *_ex3);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -220,6 +227,7 @@ private:
 public:
     PrintStmt(Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -234,6 +242,7 @@ private:
 public:
     RepeatStmt(string _varName, Expr *_ex1, Expr *_ex2, Stmt *_st1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -247,6 +256,7 @@ private:
 public:
     WhileStmt(Expr *_ex1, Stmt *_st1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -256,6 +266,7 @@ class SemicolonStmt : public Stmt {
 public:
     SemicolonStmt();
     string unparse();
+    string cppCode();
 };
 
 
@@ -271,6 +282,7 @@ class IntDecl : public Decl {
 public:
     IntDecl(string _varName);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -282,6 +294,7 @@ class FloatDecl : public Decl {
 public:
     FloatDecl(string _varName);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -293,6 +306,7 @@ class StringDecl : public Decl {
 public:
     StringDecl(string _varName);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -304,6 +318,7 @@ class BooleanDecl : public Decl {
 public:
     BooleanDecl(string _varName);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -318,6 +333,7 @@ public:
     MatrixLongDecl(string _varName1, string _varName2, string _varName3,
                    Expr *_ex1, Expr *_ex2, Expr *_ex3);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -330,6 +346,7 @@ class MatrixShortDecl : public Decl {
 public:
     MatrixShortDecl(string _varName, Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 
@@ -346,6 +363,7 @@ private:
 public:
     VarNameExpr(string _varName);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -357,6 +375,7 @@ class IntExpr : public Expr {
 public:
     IntExpr(int _val);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -368,6 +387,7 @@ class FloatExpr : public Expr {
 public:
     FloatExpr(double _val);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -379,6 +399,7 @@ class StringExpr : public Expr {
 public:
     StringExpr(string _val);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -388,6 +409,7 @@ class TrueExpr : public Expr {
 public:
     TrueExpr();
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -397,6 +419,7 @@ class FalseExpr : public Expr {
 public:
     FalseExpr();
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -408,6 +431,7 @@ class MultiplyExpr : public Expr {
 public:
     MultiplyExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -419,6 +443,7 @@ class DevideExpr : public Expr {
 public:
     DevideExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -430,6 +455,7 @@ class AddExpr : public Expr {
 public:
     AddExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -441,6 +467,7 @@ class SubtractExpr : public Expr {
 public:
     SubtractExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -452,6 +479,7 @@ class GreaterExpr : public Expr {
 public:
     GreaterExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -463,6 +491,7 @@ class GreaterEqualExpr : public Expr {
 public:
     GreaterEqualExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -474,6 +503,7 @@ class LessExpr : public Expr {
 public:
     LessExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -485,6 +515,7 @@ class LessEqualExpr : public Expr {
 public:
     LessEqualExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -496,6 +527,7 @@ class EqualEqualExpr : public Expr {
 public:
     EqualEqualExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -507,6 +539,7 @@ class NotEqualExpr : public Expr {
 public:
     NotEqualExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -518,6 +551,7 @@ class AndExpr : public Expr {
 public:
     AndExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -529,6 +563,7 @@ class OrExpr : public Expr {
 public:
     OrExpr(Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -541,6 +576,7 @@ class MatrixExpr : public Expr {
 public:
     MatrixExpr(string _varName, Expr *_ex1, Expr *_ex2);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -553,6 +589,7 @@ class NestedOrFunctionCallExpr : public Expr {
 public:
     NestedOrFunctionCallExpr(string _varName, Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -564,6 +601,7 @@ class NestedExpr : public Expr {
 public:
     NestedExpr(Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -576,6 +614,7 @@ class LetExpr : public Expr {
 public:
     LetExpr(Stmts *_stmts, Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -587,6 +626,7 @@ class IfExpr : public Expr {
 public:
     IfExpr(Expr *_ex1, Expr *_ex2, Expr *_ex3);
     string unparse();
+    string cppCode();
 };
 
 /**
@@ -598,6 +638,7 @@ class NotExpr : public Expr {
 public:
     NotExpr(Expr *_ex1);
     string unparse();
+    string cppCode();
 };
 
 #endif  // Node_H
