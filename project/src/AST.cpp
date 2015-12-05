@@ -409,12 +409,11 @@ string IfExpr::unparse() {
            ex3->unparse();
 }
 string IfExpr::cppCode() {
-    return "if ( " + ex1->cppCode() + " ) { " + ex2->cppCode() + " } " +
-           "else { " + ex3->cppCode() + " }";
+    return ex1->cppCode() + " ? " + ex2->cppCode() + " : " + ex3->cppCode();
 }
 
 // NotExpr
 // Expr ::= '!' Expr
 NotExpr::NotExpr(Expr *_ex1) { ex1 = _ex1; }
-string NotExpr::unparse() { return "! " + ex1->unparse(); }
+string NotExpr::unparse() { return "!" + ex1->unparse(); }
 string NotExpr::cppCode() { return "!" + ex1->cppCode(); }
