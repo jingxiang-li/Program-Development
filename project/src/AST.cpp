@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 
+
 // Program, concrete class, inherits from Node
 // Program ::= varName '(' ')' '{' Stmts '}'
 Program::Program(string _varName, Stmts *_stmts) {
@@ -27,11 +28,13 @@ string Program::cppCode() {
     return varName + " ( ) { " + stmts->cppCode() + " }";
 }
 
+
 // EmptyStmts, inherits from Stmts
 // Stmts ::= <<empty>>
 EmptyStmts::EmptyStmts() {}
 string EmptyStmts::unparse() { return string(""); }
 string EmptyStmts::cppCode() { return string(""); }
+
 
 // SeqStmts, inherits from Stmts
 // Stmts ::= Stmt Stmts
@@ -42,16 +45,21 @@ SeqStmts::SeqStmts(Stmt *_st1, Stmts *_stmts) {
 string SeqStmts::unparse() { return st1->unparse() + "\n" + stmts->unparse(); }
 string SeqStmts::cppCode() { return st1->cppCode() + "\n" + stmts->cppCode(); }
 
+
 // DeclStmt, inherits from Stmt
 // Stmt ::= Decl
 DeclStmt::DeclStmt(Decl *_decl) { decl = _decl; }
 string DeclStmt::unparse() { return decl->unparse(); }
 string DeclStmt::cppCode() { return decl->cppCode(); }
+
+
 // NestedStmt, inherits from Stmt
 // Stmt ::= '{' Stmts '}'
 NestedStmt::NestedStmt(Stmts *_stmts) { stmts = _stmts; }
 string NestedStmt::unparse() { return "{ " + stmts->unparse() + " }"; }
 string NestedStmt::cppCode() { return "{ " + stmts->cppCode() + " }"; }
+
+
 // IfStmt, inherits from Stmt
 // Stmt ::= 'if' '(' Expr ')' Stmt
 IfStmt::IfStmt(Expr *_ex1, Stmt *_st1) {
@@ -64,12 +72,8 @@ string IfStmt::unparse() {
 string IfStmt::cppCode() {
     return "if ( " + ex1->cppCode() + " ) " + st1->cppCode();
 }
-string NestedStmt::unparse() { 
-	return "{ " + stmts->unparse() + " }"; 
-}
-string NestedStmt::cppCode() { 
-	return "{ " + stmts->cppCode() + " }"; 
-}
+
+
 // IfElseStmt, inherits from Stmt
 // Stmt ::= 'if' '(' Expr ')' Stmt 'else' Stmt
 IfElseStmt::IfElseStmt(Expr *_ex1, Stmt *_st1, Stmt *_st2) {
@@ -82,9 +86,11 @@ string IfElseStmt::unparse() {
            st2->unparse();
 }
 string IfElseStmt::cppCode() {
-    return "if ( " + ex1->cppCode() + " ) " + st1->cppCode() + " else " +
+    return "if ( " + ex1->cppCode() + " )\n" + st1->cppCode() + " else\n" +
            st2->cppCode();
 }
+
+
 // AssignStmt, inherits from Stmt
 // Stmt ::= varName '=' Expr ';'
 AssignStmt::AssignStmt(string _varName, Expr *_ex1) {
@@ -94,6 +100,8 @@ AssignStmt::AssignStmt(string _varName, Expr *_ex1) {
 string AssignStmt::unparse() { return varName + "=" + ex1->unparse() + ";\n"; }
 
 string AssignStmt::cppCode() { return varName + "=" + ex1->cppCode() + ";\n"; }
+
+
 // RangeAssginStmt, inherits from Stmt
 // Stmt ::= varName '[' Expr ':' Expr ']' '=' Expr ';'
 RangeAssignStmt::RangeAssignStmt(string _varName, Expr *_ex1, Expr *_ex2,
@@ -108,15 +116,20 @@ string RangeAssignStmt::unparse() {
            ex3->unparse() + ";\n";
 }
 string RangeAssignStmt::cppCode() {
-    return varName + "[ " + ex1->cppCode() + " : " + ex2->cppCode() + " ] = " +
-           ex3->cppCode() + ";\n";
+    return "for (int i = " + ex1->cppCode() + "; i != " + ex2->cppCode() +
+           "; i++) {\n" + varName + "[i] = " + ex3->cppCode() + ";\n}\n";
 }
+
 
 // PrintStmt, inherits from Stmt
 // Stmt ::= 'print' '(' Expr ')' ';'
 PrintStmt::PrintStmt(Expr *_ex1) { ex1 = _ex1; }
 string PrintStmt::unparse() { return "print ( " + ex1->unparse() + " );\n"; }
-string PrintStmt::cppCode() { return "print ( " + ex1->cppCode() + " );\n"; }
+string PrintStmt::cppCode() {
+    return "std::cout << " + ex1->cppCode() + " << std::endl;\n";
+}
+
+
 // RepeatStmt, inherits from Stmt
 // Stmt ::= 'repeat' '(' varName '=' Expr 'to' Expr ')' Stmt
 RepeatStmt::RepeatStmt(string _varName, Expr *_ex1, Expr *_ex2, Stmt *_st1) {
@@ -130,9 +143,11 @@ string RepeatStmt::unparse() {
            ex2->unparse() + " ) " + st1->unparse();
 }
 string RepeatStmt::cppCode() {
-    return "repeat ( " + varName + " = " + ex1->cppCode() + " to " +
-           ex2->cppCode() + " ) " + st1->cppCode();
+    return "for (" + varName + "=" + ex1->cppCode() + "; " + varName + " != " +
+           ex2->cppCode() + "; "+ varName + "++) {\n" + st1->cppCode() +
+           "\n}\n";
 }
+
 
 // WhileStmt, inherits from Stmt
 // Stmt ::= 'while' '(' Expr ')' Stmt
@@ -144,34 +159,45 @@ string WhileStmt::unparse() {
     return "while ( " + ex1->unparse() + " ) " + st1->unparse();
 }
 string WhileStmt::cppCode() {
-    return "while ( " + ex1->cppCode() + " ) " + st1->cppCode();
+    return "while ( " + ex1->cppCode() + " ) {\n" + st1->cppCode() + "\n}\n";
 }
+
 
 // SemicolonStmt, inherits from Stmt
 // Stmt ::= ';'
 SemicolonStmt::SemicolonStmt() {}
 string SemicolonStmt::unparse() { return ";\n"; }
 string SemicolonStmt::cppCode() { return ";\n"; }
+
+
 // IntDecl
 // Decl ::= 'int' varName ';'
 IntDecl::IntDecl(string _varName) { varName = _varName; }
 string IntDecl::unparse() { return "int " + varName + " ;\n"; }
 string IntDecl::cppCode() { return "int " + varName + " ;\n"; }
+
+
 // FloatDecl
 // Decl ::= 'float' varName ';'
 FloatDecl::FloatDecl(string _varName) { varName = _varName; }
 string FloatDecl::unparse() { return "float " + varName + " ;\n"; }
 string FloatDecl::cppCode() { return "float " + varName + " ;\n"; }
+
+
 // StringDecl
 // Decl ::= 'string' varName ';'
 StringDecl::StringDecl(string _varName) { varName = _varName; }
 string StringDecl::unparse() { return "string " + varName + " ;\n"; }
 string StringDecl::cppCode() { return "string " + varName + " ;\n"; }
+
+
 // BooleanDecl
 // Decl ::= 'boolean' varName ';'
 BooleanDecl::BooleanDecl(string _varName) { varName = _varName; }
 string BooleanDecl::unparse() { return "boolean " + varName + " ;\n"; }
-string BooleanDecl::cppCode() { return "boolean " + varName + " ;\n"; }
+string BooleanDecl::cppCode() { return "bool " + varName + " ;\n"; }
+
+
 // MatrixLongDecl
 // Decl ::= 'matrix' varName '[' Expr ':' Expr ']' varName ':' varName  '=' Expr
 // ';'
@@ -191,10 +217,9 @@ string MatrixLongDecl::unparse() {
            ex3->unparse() + ";\n";
 }
 string MatrixLongDecl::cppCode() {
-    return "matrix " + varName1 + "[ " + ex1->cppCode() + " : " +
-           ex2->cppCode() + " ] " + varName2 + " : " + varName3 + " = " +
-           ex3->cppCode() + ";\n";
+    return "matrix " + varName1 + "( " + ex1->cppCode() + ", " + ex2->cppCode() + " );\n" + "for (int " + varName2 +" = 0; " + varName2 + " != " +varName1 + ".numRows(); " + varName2 + "++)\n" + "for (int " + varName3 +" = 0; " + varName3 + " != " +varName1 + ".numCols(); " + varName3 + "++) {\n" + varName1 + "[" + varName2 + "][" + varName3 + "] = " + ex3->cppCode() + "\n}\n";
 }
+
 
 // MatrixShortDecl
 // Decl ::= 'matrix' varName '=' Expr ';'
@@ -208,11 +233,14 @@ string MatrixShortDecl::unparse() {
 string MatrixShortDecl::cppCode() {
     return "matrix " + varName + " = " + ex1->cppCode() + ";\n";
 }
+
+
 // VarNameExpr
 // Expr ::= varName
 VarNameExpr::VarNameExpr(string _varName) { varName = _varName; }
 string VarNameExpr::unparse() { return varName; }
 string VarNameExpr::cppCode() { return varName; }
+
 
 // IntExpr
 // Expr ::= integerConst
@@ -220,11 +248,13 @@ IntExpr::IntExpr(int _val) { val = _val; }
 string IntExpr::unparse() { return to_string(val); }
 string IntExpr::cppCode() { return to_string(val); }
 
+
 // FloatExpr
 // Expr ::= floatConst
 FloatExpr::FloatExpr(double _val) { val = _val; }
 string FloatExpr::unparse() { return to_string(val); }
 string FloatExpr::cppCode() { return to_string(val); }
+
 
 // StringExpr
 // Expr ::= stringConst
@@ -232,17 +262,20 @@ StringExpr::StringExpr(string _val) { val = _val; }
 string StringExpr::unparse() { return val; }
 string StringExpr::cppCode() { return val; }
 
+
 // TrueExpr
 // Expr ::= 'true'
 TrueExpr::TrueExpr() {}
 string TrueExpr::unparse() { return string("true"); }
 string TrueExpr::cppCode() { return string("true"); }
 
+
 // FalseExpr
 // Expr ::= 'false'
 FalseExpr::FalseExpr() {}
 string FalseExpr::unparse() { return string("false"); }
 string FalseExpr::cppCode() { return string("false"); }
+
 
 // MultiplyExpr
 // Expr ::= Expr '*' Expr
@@ -257,6 +290,7 @@ string MultiplyExpr::cppCode() {
     return ex1->cppCode() + " * " + ex2->cppCode();
 }
 
+
 // DevideExpr
 // Expr ::= Expr '/' Expr
 DevideExpr::DevideExpr(Expr *_ex1, Expr *_ex2) {
@@ -266,6 +300,7 @@ DevideExpr::DevideExpr(Expr *_ex1, Expr *_ex2) {
 string DevideExpr::unparse() { return ex1->unparse() + " / " + ex2->unparse(); }
 string DevideExpr::cppCode() { return ex1->cppCode() + " * " + ex2->cppCode(); }
 
+
 // AddExpr
 // Expr ::= Expr '+' Expr
 AddExpr::AddExpr(Expr *_ex1, Expr *_ex2) {
@@ -274,6 +309,7 @@ AddExpr::AddExpr(Expr *_ex1, Expr *_ex2) {
 }
 string AddExpr::unparse() { return ex1->unparse() + " + " + ex2->unparse(); }
 string AddExpr::cppCode() { return ex1->cppCode() + " + " + ex2->cppCode(); }
+
 
 // SubtractExpr
 // Expr ::= Expr '-' Expr
@@ -288,6 +324,7 @@ string SubtractExpr::cppCode() {
     return ex1->cppCode() + " - " + ex2->cppCode();
 }
 
+
 // GreaterExpr
 // Expr ::= Expr '>' Expr
 GreaterExpr::GreaterExpr(Expr *_ex1, Expr *_ex2) {
@@ -300,6 +337,7 @@ string GreaterExpr::unparse() {
 string GreaterExpr::cppCode() {
     return ex1->cppCode() + " > " + ex2->cppCode();
 }
+
 
 // GreaterEqualExpr
 // Expr ::= Expr '>=' Expr
@@ -314,6 +352,7 @@ string GreaterEqualExpr::cppCode() {
     return ex1->cppCode() + " >= " + ex2->cppCode();
 }
 
+
 // LessExpr
 // Expr ::= Expr '<' Expr
 LessExpr::LessExpr(Expr *_ex1, Expr *_ex2) {
@@ -322,6 +361,7 @@ LessExpr::LessExpr(Expr *_ex1, Expr *_ex2) {
 }
 string LessExpr::unparse() { return ex1->unparse() + " < " + ex2->unparse(); }
 string LessExpr::cppCode() { return ex1->cppCode() + " < " + ex2->cppCode(); }
+
 
 // LessEqualExpr
 // Expr ::= Expr '<=' Expr
@@ -336,6 +376,7 @@ string LessEqualExpr::cppCode() {
     return ex1->cppCode() + " <= " + ex2->cppCode();
 }
 
+
 // EqualEqualExpr
 // Expr ::= Expr '==' Expr
 EqualEqualExpr::EqualEqualExpr(Expr *_ex1, Expr *_ex2) {
@@ -348,6 +389,7 @@ string EqualEqualExpr::unparse() {
 string EqualEqualExpr::cppCode() {
     return ex1->cppCode() + " == " + ex2->cppCode();
 }
+
 
 // NotEqualExpr
 // Expr ::= Expr '!=' Expr
@@ -362,6 +404,7 @@ string NotEqualExpr::cppCode() {
     return ex1->cppCode() + " != " + ex2->cppCode();
 }
 
+
 // AndExpr
 // Expr ::= Expr '&&' Expr
 AndExpr::AndExpr(Expr *_ex1, Expr *_ex2) {
@@ -371,6 +414,7 @@ AndExpr::AndExpr(Expr *_ex1, Expr *_ex2) {
 string AndExpr::unparse() { return ex1->unparse() + " && " + ex2->unparse(); }
 string AndExpr::cppCode() { return ex1->cppCode() + " && " + ex2->cppCode(); }
 
+
 // OrExpr
 // Expr ::= Expr '||' Expr
 OrExpr::OrExpr(Expr *_ex1, Expr *_ex2) {
@@ -379,6 +423,7 @@ OrExpr::OrExpr(Expr *_ex1, Expr *_ex2) {
 }
 string OrExpr::unparse() { return ex1->unparse() + " || " + ex2->unparse(); }
 string OrExpr::cppCode() { return ex1->cppCode() + " || " + ex2->cppCode(); }
+
 
 // MatrixExpr
 // Expr ::= varName '[' Expr ':' Expr ']'
@@ -395,6 +440,7 @@ string MatrixExpr::cppCode() {
            ex2->cppCode() + " )";
 }
 
+
 // NestedOrFunctionCallExpr
 // Expr ::= varName '(' Expr ')'
 NestedOrFunctionCallExpr::NestedOrFunctionCallExpr(string _varName,
@@ -409,11 +455,13 @@ string NestedOrFunctionCallExpr::cppCode() {
     return varName + "( " + ex1->cppCode() + " )";
 }
 
+
 // NestedExpr
 // Expr ::= '(' Expr ')'
 NestedExpr::NestedExpr(Expr *_ex1) { ex1 = _ex1; }
 string NestedExpr::unparse() { return "( " + ex1->unparse() + " )"; }
 string NestedExpr::cppCode() { return "( " + ex1->cppCode() + " )"; }
+
 
 // LetExpr
 // Expr ::= 'let' Stmts 'in' Expr 'end'
@@ -428,6 +476,7 @@ string LetExpr::cppCode() {
     return "({ " + stmts->cppCode() + ex1->cppCode() + " })";
 }
 
+
 // IfExpr
 // Expr ::= 'if' Expr 'then' Expr 'else' Ex
 IfExpr::IfExpr(Expr *_ex1, Expr *_ex2, Expr *_ex3) {
@@ -440,8 +489,9 @@ string IfExpr::unparse() {
            ex3->unparse();
 }
 string IfExpr::cppCode() {
-    return ex1->cppCode() + " ? " + ex2->cppCode() + " : " + ex3->cppCode();
+    return "(" + ex1->cppCode() + ")" + " ? " + "(" + ex2->cppCode() + ")" + " : " + "(" + ex3->cppCode() + ")";
 }
+
 
 // NotExpr
 // Expr ::= '!' Expr
