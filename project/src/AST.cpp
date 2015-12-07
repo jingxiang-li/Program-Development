@@ -25,7 +25,7 @@ string Program::unparse() {
     return varName + " ( ) { " + stmts->unparse() + " }";
 }
 string Program::cppCode() {
-    return varName + " ( ) { " + stmts->cppCode() + " }";
+    return "#include <iostream>\n#include \"Matrix.h\"\nint " + varName + " ( ) {\n" + stmts->cppCode() + " }";
 }
 
 
@@ -126,7 +126,7 @@ string RangeAssignStmt::cppCode() {
 PrintStmt::PrintStmt(Expr *_ex1) { ex1 = _ex1; }
 string PrintStmt::unparse() { return "print ( " + ex1->unparse() + " );\n"; }
 string PrintStmt::cppCode() {
-    return "std::cout << " + ex1->cppCode() + " << std::endl;\n";
+    return "std::cout << " + ex1->cppCode() + ";\n";
 }
 
 
@@ -144,7 +144,7 @@ string RepeatStmt::unparse() {
 }
 string RepeatStmt::cppCode() {
     return "for (" + varName + "=" + ex1->cppCode() + "; " + varName + " != " +
-           ex2->cppCode() + "; "+ varName + "++) {\n" + st1->cppCode() +
+           ex2->cppCode() + " + 1; "+ varName + "++) {\n" + st1->cppCode() +
            "\n}\n";
 }
 
@@ -217,7 +217,7 @@ string MatrixLongDecl::unparse() {
            ex3->unparse() + ";\n";
 }
 string MatrixLongDecl::cppCode() {
-    return "matrix " + varName1 + "( " + ex1->cppCode() + ", " + ex2->cppCode() + " );\n" + "for (int " + varName2 +" = 0; " + varName2 + " != " +varName1 + ".numRows(); " + varName2 + "++)\n" + "for (int " + varName3 +" = 0; " + varName3 + " != " +varName1 + ".numCols(); " + varName3 + "++) {\n" + varName1 + "[" + varName2 + "][" + varName3 + "] = " + ex3->cppCode() + "\n}\n";
+    return "matrix " + varName1 + "( " + ex1->cppCode() + ", " + ex2->cppCode() + " );\n" + "for (int " + varName2 +" = 0; " + varName2 + " != " +varName1 + ".numRows(); " + varName2 + "++)\n" + "for (int " + varName3 +" = 0; " + varName3 + " != " +varName1 + ".numCols(); " + varName3 + "++) {\n" + varName1 + "[" + varName2 + "][" + varName3 + "] = " + ex3->cppCode() + ";\n}\n";
 }
 
 
@@ -436,8 +436,8 @@ string MatrixExpr::unparse() {
     return varName + " [ " + ex1->unparse() + " : " + ex2->unparse() + " ]";
 }
 string MatrixExpr::cppCode() {
-    return "matrix " + varName + " ( " + ex1->cppCode() + ", " +
-           ex2->cppCode() + " )";
+    return varName + "[" + ex1->cppCode() + "][" +
+           ex2->cppCode() + "]";
 }
 
 
@@ -473,7 +473,7 @@ string LetExpr::unparse() {
     return "let " + stmts->unparse() + " in " + ex1->unparse() + " end";
 }
 string LetExpr::cppCode() {
-    return "({ " + stmts->cppCode() + ex1->cppCode() + " })";
+    return "({ " + stmts->cppCode() + ex1->cppCode() + ";\n})";
 }
 
 

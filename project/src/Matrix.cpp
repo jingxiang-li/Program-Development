@@ -9,7 +9,11 @@ matrix::matrix(int row, int col) : rows(row), cols(col) {
     }
 }
 
-matrix::matrix(const matrix &m) : matrix(m.rows, m.cols) {
+matrix::matrix(const matrix &m) {
+    data = new float *[rows];
+    for (int i = 0; i != rows; i++) {
+        data[i] = new float[cols];
+    }
     for (int i = 0; i != rows; i++)
         for (int j = 0; j != cols; j++) {
             data[i][j] = m[i][j];
@@ -47,7 +51,7 @@ matrix operator*(const matrix &left, const matrix &right) {
 }
 
 matrix matrix::matrixRead(std::string filename) {
-    std::ifstream is(filename);
+    std::ifstream is(filename.c_str(), std::ifstream::in);
 
     // read nrows and ncols
     int nrows, ncols;
