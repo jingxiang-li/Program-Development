@@ -9,6 +9,7 @@ class matrix {
 public:
     matrix(int row, int col);
     matrix(const matrix &m);
+    ~matrix();
 
     int numRows() const;
     int numCols() const;
@@ -20,8 +21,6 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const matrix &m);
 
     friend matrix operator*(const matrix &left, const matrix &right);
-
-    static matrix matrixRead(std::string filename);
 
 private:
     // we don't implement matrix() {} ??
@@ -36,5 +35,13 @@ private:
        you. */
     float **data;
 };
+
+matrix matrixRead(std::string &filename);
+
+matrix matrixRead(const char *filename);
+
+int numRows(matrix &m);
+
+int numCols(matrix &m);
 
 #endif  // MATRIX_H

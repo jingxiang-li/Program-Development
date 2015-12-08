@@ -6,6 +6,8 @@ matrix::matrix(int row, int col) : rows(row), cols(col) {
     data = new float *[rows];
     for (int i = 0; i != rows; i++) {
         data[i] = new float[cols];
+        for (int j = 0; j != cols; j++)
+            data[i][j] = 0;
     }
 }
 
@@ -20,6 +22,13 @@ matrix::matrix(const matrix &m) {
         }
 }
 
+matrix::~matrix() {
+    for (int i = 0; i != rows; i++) {
+        delete[] data[i];
+    }
+    delete[] data;
+}
+
 int matrix::numRows() const { return rows; }
 
 int matrix::numCols() const { return cols; }
@@ -28,10 +37,17 @@ float *matrix::operator[](int row) { return data[row]; }
 
 const float *matrix::operator[](int row) const { return data[row]; }
 
+/* DEPRECATED, USE [][]
+float *matrix::access(int row, int col) const {
+    return data[row] + col;
+}
+ */
+
 std::ostream &operator<<(std::ostream &os, const matrix &m) {
+    os << m.numRows() << " " << m.numCols() << std::endl;
     for (int i = 0; i != m.numRows(); i++) {
         for (int j = 0; j != m.numCols(); j++) {
-            os << m[i][j] << " ";
+            os << m[i][j] << "  ";
         }
         os << std::endl;
     }
@@ -50,8 +66,8 @@ matrix operator*(const matrix &left, const matrix &right) {
     return m;
 }
 
-matrix matrix::matrixRead(std::string filename) {
-    std::ifstream is(filename.c_str(), std::ifstream::in);
+matrix matrixRead(const char *filename) {
+    std::ifstream is(filename, std::ifstream::in);
 
     // read nrows and ncols
     int nrows, ncols;
@@ -66,4 +82,16 @@ matrix matrix::matrixRead(std::string filename) {
             is >> m[i][j];
         }
     return m;
+}
+
+matrix matrixRead(std::string &filename) {
+    return matrixRead(filename.c_str());
+}
+
+int numRows(matrix &m) {
+    return m.numRows();
+}
+
+int numCols(matrix &m) {
+    return m.numCols();
 }
