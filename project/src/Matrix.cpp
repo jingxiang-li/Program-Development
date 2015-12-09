@@ -10,15 +10,14 @@ matrix::matrix(int row, int col) : rows(row), cols(col) {
     }
 }
 
-matrix::matrix(const matrix &m) {
+matrix::matrix(const matrix &m) : rows(m.rows), cols(m.cols) {
     data = new float *[rows];
     for (int i = 0; i != rows; i++) {
         data[i] = new float[cols];
-    }
-    for (int i = 0; i != rows; i++)
         for (int j = 0; j != cols; j++) {
             data[i][j] = m[i][j];
         }
+    }
 }
 
 matrix::~matrix() {
