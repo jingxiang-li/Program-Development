@@ -80,6 +80,11 @@ clean:
 		codegeneration_tests codegeneration_tests.cpp \
 		../samples/*up* ../samples/*.diff ../samples/*.output \
 		../samples/my_code_1 ../samples/my_code_2 \
-		../samples/sample_1 ../samples/sample_2 ../samples/sample_3 ../samples/sample_7 ../samples/sample_8 \
-		../samples/forest_loss_v2
+		../samples/sample_1 ../samples/sample_2 \
+		../samples/sample_3 ../samples/sample_7 \
+		../samples/sample_8 ../samples/forest_loss_v2 \
+		../samples/my_code_1.cpp ../samples/my_code_2.cpp \
+		../samples/sample_1.cpp ../samples/sample_2.cpp \
+		../samples/sample_3.cpp ../samples/sample_7.cpp \
+		../samples/sample_8.cpp ../samples/forest_loss_v2.cpp
 

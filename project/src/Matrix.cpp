@@ -6,8 +6,7 @@ matrix::matrix(int row, int col) : rows(row), cols(col) {
     data = new float *[rows];
     for (int i = 0; i != rows; i++) {
         data[i] = new float[cols];
-        for (int j = 0; j != cols; j++)
-            data[i][j] = 0;
+        for (int j = 0; j != cols; j++) data[i][j] = 0;
     }
 }
 
@@ -55,6 +54,13 @@ std::ostream &operator<<(std::ostream &os, const matrix &m) {
 }
 
 matrix operator*(const matrix &left, const matrix &right) {
+    if (left.numCols() != right.numRows()) {
+        std::cerr << "ERROR, two matrices cannot be multiplied with dimensions "
+                  << left.numRows() << "x" << left.numCols() << " and "
+                  << right.numRows() << "x" << right.numCols() << std::endl;
+        exit(1);
+    }
+
     matrix m(left.numRows(), right.numCols());
     for (int i = 0; i != m.numRows(); i++) {
         for (int j = 0; j != m.numCols(); j++) {
@@ -88,10 +94,6 @@ matrix matrixRead(std::string &filename) {
     return matrixRead(filename.c_str());
 }
 
-int numRows(matrix &m) {
-    return m.numRows();
-}
+int numRows(matrix &m) { return m.numRows(); }
 
-int numCols(matrix &m) {
-    return m.numCols();
-}
+int numCols(matrix &m) { return m.numCols(); }

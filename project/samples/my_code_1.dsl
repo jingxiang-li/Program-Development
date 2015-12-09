@@ -2,16 +2,19 @@
 2-dimensional matrices and save it
 in a file with this name. */
 
-main () { 
-  int x;
-  x = 2 + 4;
-  int y;
-  y = x * 3 ;
-
-  print(x) ;
-  print("\n") ;
-  print(y) ;
-  print("\n") ;
+main () {
+  matrix m1 [2 : 2] i : j = 0;
+  m1[0 : 0] = 1;
+  m1[0 : 1] = 2;
+  m1[1 : 0] = 3;
+  m1[1 : 1] = 4;
+  matrix m2 [2 : 2] i : j = 0;
+  m2[0 : 0] = 4;
+  m2[0 : 1] = 3;
+  m2[1 : 0] = 2;
+  m2[1 : 1] = 1;
+  matrix m = m1 * m2;
+  print(m);
 }
 
 

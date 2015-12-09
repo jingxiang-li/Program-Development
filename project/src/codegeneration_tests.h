@@ -98,7 +98,7 @@ public:
     /* You should create .expected files in ../samples for these with the expected
      * output of the two CDAL programs you create. You can then change the second argument to true to
      * validate them after you get the translation working . */
-    void xtest_your_code_1 ( void ) { codegen_tests ( "my_code_1", false ) ; }
+    void test_your_code_1 ( void ) { codegen_tests ( "my_code_1", true ) ; }
     void xtest_your_code_2 ( void ) { codegen_tests ( "my_code_2", false ) ; }
 
     void test_forest_loss ( void ) { codegen_tests ( "forest_loss_v2", true ); }
