@@ -641,4 +641,8 @@ public:
     string cppCode();
 };
 
+// a helper function used to indent codes
+// making the translated cpp file more readable
+string indent(string &s);
+
 #endif  // Node_H

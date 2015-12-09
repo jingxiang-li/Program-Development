@@ -12,8 +12,8 @@
 
 #include "./AST.h"
 #include <iostream>
+#include <sstream>
 #include <string>
-
 
 // Program, concrete class, inherits from Node
 // Program ::= varName '(' ')' '{' Stmts '}'
@@ -25,9 +25,10 @@ string Program::unparse() {
     return varName + " ( ) { " + stmts->unparse() + " }";
 }
 string Program::cppCode() {
+    string innerStmt = stmts->cppCode();
     return "#include <cmath>\n#include <iostream>\n#include "
            "\"Matrix.h\"\n\nint " +
-           varName + " () {\n" + stmts->cppCode() + "}";
+           varName + "() {\n" + indent(innerStmt) + "}";
 }
 
 
@@ -59,7 +60,10 @@ string DeclStmt::cppCode() { return decl->cppCode(); }
 // Stmt ::= '{' Stmts '}'
 NestedStmt::NestedStmt(Stmts *_stmts) { stmts = _stmts; }
 string NestedStmt::unparse() { return "{ " + stmts->unparse() + " }"; }
-string NestedStmt::cppCode() { return "{\n" + stmts->cppCode() + "}"; }
+string NestedStmt::cppCode() {
+    string innerStmt = stmts->cppCode();
+    return "{\n" + indent(innerStmt) + "}";
+}
 
 
 // IfStmt, inherits from Stmt
@@ -72,7 +76,7 @@ string IfStmt::unparse() {
     return "if ( " + ex1->unparse() + " ) " + st1->unparse();
 }
 string IfStmt::cppCode() {
-    return "if ( " + ex1->cppCode() + " ) " + st1->cppCode();
+    return "if (" + ex1->cppCode() + ") " + st1->cppCode();
 }
 
 
@@ -88,7 +92,7 @@ string IfElseStmt::unparse() {
            st2->unparse();
 }
 string IfElseStmt::cppCode() {
-    return "if ( " + ex1->cppCode() + " )\n" + st1->cppCode() + " else\n" +
+    return "if (" + ex1->cppCode() + ") " + st1->cppCode() + " else " +
            st2->cppCode();
 }
 
@@ -158,7 +162,7 @@ string WhileStmt::unparse() {
     return "while ( " + ex1->unparse() + " ) " + st1->unparse();
 }
 string WhileStmt::cppCode() {
-    return "while ( " + ex1->cppCode() + " ) {\n" + st1->cppCode() + "\n}\n";
+    return "while (" + ex1->cppCode() + ") " + st1->cppCode();
 }
 
 
@@ -179,22 +183,22 @@ string IntDecl::cppCode() { return "int " + varName + ";"; }
 // FloatDecl
 // Decl ::= 'float' varName ';'
 FloatDecl::FloatDecl(string _varName) { varName = _varName; }
-string FloatDecl::unparse() { return "float " + varName + " ;"; }
-string FloatDecl::cppCode() { return "float " + varName + " ;"; }
+string FloatDecl::unparse() { return "float " + varName + ";"; }
+string FloatDecl::cppCode() { return "float " + varName + ";"; }
 
 
 // StringDecl
 // Decl ::= 'string' varName ';'
 StringDecl::StringDecl(string _varName) { varName = _varName; }
-string StringDecl::unparse() { return "string " + varName + " ;"; }
-string StringDecl::cppCode() { return "string " + varName + " ;"; }
+string StringDecl::unparse() { return "string " + varName + ";"; }
+string StringDecl::cppCode() { return "string " + varName + ";"; }
 
 
 // BooleanDecl
 // Decl ::= 'boolean' varName ';'
 BooleanDecl::BooleanDecl(string _varName) { varName = _varName; }
-string BooleanDecl::unparse() { return "boolean " + varName + " ;"; }
-string BooleanDecl::cppCode() { return "bool " + varName + " ;"; }
+string BooleanDecl::unparse() { return "boolean " + varName + ";"; }
+string BooleanDecl::cppCode() { return "bool " + varName + ";"; }
 
 
 // MatrixLongDecl
@@ -216,12 +220,17 @@ string MatrixLongDecl::unparse() {
            ex3->unparse() + ";\n";
 }
 string MatrixLongDecl::cppCode() {
-    return "matrix " + varName1 + "(" + ex1->cppCode() + ", " + ex2->cppCode() +
-           ");\n" + "for (int " + varName2 + " = 0; " + varName2 + " != " +
-           varName1 + ".numRows(); " + varName2 + "++)\n" + "for (int " +
-           varName3 + " = 0; " + varName3 + " != " + varName1 + ".numCols(); " +
-           varName3 + "++) {\n" + varName1 + "[" + varName2 + "][" + varName3 +
-           "] = " + ex3->cppCode() + ";\n}";
+    string forStmt1 = "matrix " + varName1 + "(" + ex1->cppCode() + ", " +
+                      ex2->cppCode() + ");\n" + "for (int " + varName2 +
+                      " = 0; " + varName2 + " != " + varName1 + ".numRows(); " +
+                      varName2 + "++) {\n";
+    string innerStmts = varName1 + "[" + varName2 + "][" + varName3 + "] = " +
+                        ex3->cppCode() + ";";
+    string forStmt2 = "for (int " + varName3 + " = 0; " + varName3 + " != " +
+                      varName1 + ".numCols(); " + varName3 + "++) {\n" +
+                      indent(innerStmts) + "}";
+
+    return forStmt1 + indent(forStmt2) + "}";
 }
 
 
@@ -476,7 +485,8 @@ string LetExpr::unparse() {
     return "let " + stmts->unparse() + " in " + ex1->unparse() + " end";
 }
 string LetExpr::cppCode() {
-    return "({\n" + stmts->cppCode() + ex1->cppCode() + ";\n})";
+    string innerStmts = stmts->cppCode() + ex1->cppCode() + ";";
+    return "({\n" + indent(innerStmts) + "})";
 }
 
 
@@ -501,3 +511,19 @@ string IfExpr::cppCode() {
 NotExpr::NotExpr(Expr *_ex1) { ex1 = _ex1; }
 string NotExpr::unparse() { return "!" + ex1->unparse(); }
 string NotExpr::cppCode() { return "!" + ex1->cppCode(); }
+
+
+/**
+ * make indentation for all lines in the given input string
+ * @param  input a given input string
+ * @return       string with well indented lines
+ */
+string indent(string &s) {
+    std::stringstream ss(s);
+    std::string item;
+    std::string output;
+    while (std::getline(ss, item, '\n')) {
+        output += "    " + item + '\n';
+    }
+    return output;
+}
