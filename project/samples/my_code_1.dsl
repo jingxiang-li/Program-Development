@@ -3,16 +3,8 @@
 in a file with this name. */
 
 main () {
-  matrix m1 [2 : 2] i : j = 0;
-  m1[0 : 0] = 1;
-  m1[0 : 1] = 2;
-  m1[1 : 0] = 3;
-  m1[1 : 1] = 4;
-  matrix m2 [2 : 2] i : j = 0;
-  m2[0 : 0] = 4;
-  m2[0 : 1] = 3;
-  m2[1 : 0] = 2;
-  m2[1 : 1] = 1;
+  matrix m1 = matrixRead("../samples/my_code_1_0.data") ;
+  matrix m2 = matrixRead("../samples/my_code_1_1.data") ;
   matrix m = m1 * m2;
   print(m);
 }
