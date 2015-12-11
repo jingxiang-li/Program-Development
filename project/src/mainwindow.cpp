@@ -21,7 +21,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_makeButton_clicked()
 {
     QProcess *cMake = new QProcess(this);
-    QString file = QDir::homePath() + "//instr//instructor-repo//F15-project-solution//iter4-solution//src//";
+    QString file = QDir::currentPath() + "/../src/";
     QStringList args;
 
     args.append("-C");
