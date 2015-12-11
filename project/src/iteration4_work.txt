@@ -1,0 +1,19 @@
+Tanoja Sunkam (Sunka004)
+Jingxiang Li  (Lixx3899)
+
+Division of Work Statement
+
+For the AST.cpp file,  we both divided the work equally. Tanoja implemented the cppCode() for Stmt, Stmts, Decl, and Jingxiang implemented the cppCode() for Expr.
+We debugged all the cppCode() functions together and made sure that all the tests passed.
+For Matrix.h and Matrix.cpp we designed together.
+We created the make button and clean button using qtCreator GUI.
+Jingxiand designed my_code_1.dsl file and Tanoja designed my_code_2.dsl file.
+
+
+
+
+
+
+
+
+
