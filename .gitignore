@@ -3,3 +3,5 @@
 *~
 html/
 latex/
+build-iter4-Desktop*/
+*.pro.*
